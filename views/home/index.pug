@@ -7,7 +7,7 @@ html(lang="en")
         title Document
         script(type="application/javascript" src="/client.js")
     body
-        button(onclick=``)="Get update"
+       
         
         each d, index in notifications
             h2(onclick=`alert(${index})`)= `${d.symbol} created ${d.trend.toLowerCase()} trend`
