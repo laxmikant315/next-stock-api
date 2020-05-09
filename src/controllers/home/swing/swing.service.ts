@@ -497,8 +497,8 @@ export const getSwingStocks = async (trend = "UP") => {
     const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
 
     //  const finalStocks= swingStocks.filter(x=> symbols.includes(x))
-    // const finalStocks = symbols;
-    const finalStocks= ["SWSOLAR","TV18BRDCST"]
+     const finalStocks = symbols;
+    // const finalStocks= ["SWSOLAR","TV18BRDCST"]
     console.log("Total Stocks", finalStocks.length);
     for (let x of finalStocks) {
       try {
