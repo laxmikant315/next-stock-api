@@ -46,7 +46,7 @@ class BullController implements IControllerBase {
 
       this.myFirstQueue.on("completed", (job, result) => {
         console.log(
-          `Job completed with result  ${JSON.stringify(result, null, 2)}`
+          `Cron Job completed with result on ${this.cron} , result=> ${JSON.stringify(result, null, 2)}`
         );
       });
     } catch (error) {
@@ -92,7 +92,7 @@ class BullController implements IControllerBase {
       // ]
       if (data && data.length > 0) {
         for (let d of data) {
-          if (d.goodOne) {
+          // if (d.goodOne) {
             this.insertNotification(d);
 
             const payload = JSON.stringify({
@@ -109,7 +109,7 @@ class BullController implements IControllerBase {
                 });
               }
             }
-          }
+          // }
         }
       }
 
