@@ -144,6 +144,7 @@ class BullController implements IControllerBase {
       const payload = JSON.stringify({
         title: "test",
         body: "This push is from Manual Push",
+        image: 'https://source.unsplash.com/random/300×300'
       });
 
 
@@ -164,18 +165,18 @@ class BullController implements IControllerBase {
       const subscription = req.body;
       this.subscriptionMain.push(req.body);
       res.status(201).json({});
-      const payload = JSON.stringify({
-        title: "test",
-        body: "This push is from Test",
-      });
+      // const payload = JSON.stringify({
+      //   title: "test",
+      //   body: "This push is from Test",
+      // });
 
-      console.log(subscription);
+      // console.log(subscription);
 
-      webpush.sendNotification(subscription, payload).catch((error) => {
-        console.error(error.stack);
-      });
+      // webpush.sendNotification(subscription, payload).catch((error) => {
+      //   console.error(error.stack);
+      // });
 
-      console.log("Test Pushed.", payload);
+      // console.log("Test Pushed.", payload);
     });
   }
 }
