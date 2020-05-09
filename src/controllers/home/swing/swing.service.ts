@@ -148,8 +148,8 @@ export const getHistorical = async (
     .then((x) => {
       return x.data.data.candles;
     })
-    .catch((x) => {
-      console.log(x);
+    .catch((error) => {
+      console.log(error.response.data.message);
       return null;
     });
 };
@@ -166,7 +166,18 @@ const getPriceAction = async (
   }
 
   const data = await getHistorical(instrumentToken, interval, from);
+  let avgHeight = 0;
 
+  if (data) {
+    let heightArr = [];
+    for (let d of data) {
+      const height = Math.abs(d[1] - d[4]);
+      heightArr.push(height);
+    }
+
+    const totalHeight = heightArr.reduce((x, y) => x + y);
+    avgHeight = totalHeight / data.length;
+  }
   // const highestHigh = Math.max(...data.map(x => x[2]));
 
   const highestHigh = getHighestHigh(data);
@@ -186,12 +197,18 @@ const getPriceAction = async (
   let dataFirst60, dataLast60;
   let goingUp = false;
   if (highestHigh.indexNo < lowestLow.indexNo) {
-    dataFirst60 = data.slice(highestHigh.indexNo, highestHigh.indexNo + per60 + 1);
+    dataFirst60 = data.slice(
+      highestHigh.indexNo,
+      highestHigh.indexNo + per60 + 1
+    );
     dataLast60 = data.slice(lowestLow.indexNo - per60, lowestLow.indexNo + 1);
   } else {
     goingUp = true;
     dataFirst60 = data.slice(lowestLow.indexNo, lowestLow.indexNo + per60 + 1);
-    dataLast60 = data.slice(highestHigh.indexNo - per60, highestHigh.indexNo + 1);
+    dataLast60 = data.slice(
+      highestHigh.indexNo - per60,
+      highestHigh.indexNo + 1
+    );
   }
 
   const latestCandel = data[data.length - 1];
@@ -321,6 +338,9 @@ const getPriceAction = async (
     valid,
     firstHourData: { fhdHigh, fhdLow },
     lastCandelIsGreen,
+    avgHeight,
+    lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
+    currentPrice: latestCandel[4],
   };
 };
 
@@ -375,6 +395,7 @@ const getDayData = async (instrumentToken, interval = "day") => {
   const lastCandelHeight = +data[data.length - 1][5].toFixed(2);
   const allowedRange = +((avg * 70) / 100).toFixed(2);
   const goodOne = lastCandelHeight < allowedRange;
+
   return { avg, lastCandelHeight, goodOne, allowedRange, data };
 };
 
@@ -449,35 +470,47 @@ const getDetails = async (symbol: any) => {
   const instrument = getInsruments(symbol);
 
   const priceAction = await getPriceAction(instrument, "day");
+  if (
+    priceAction.currentPrice > 100 &&
+    priceAction.valid &&
+     priceAction.lastCandelHeight > priceAction.avgHeight*80/100
+  ) {
+    const dayData = await getDayData(instrument, "month");
 
-  const dayData = await getDayData(instrument, "month");
-
-  const { goodOne, avg, lastCandelHeight, allowedRange } = dayData;
-  const {
-    trend,
-    valid,
-    highestHigh,
-    lowestLow,
-    high,
-    low,
-    lastCandelIsGreen,
-  } = priceAction;
-  const data = {
-    instrument,
-    goodOne,
-    trend,
-    valid,
-    symbol,
-    avgCandelSize: avg,
-    todayCandelSize: lastCandelHeight,
-    allowedCandelSize: allowedRange,
-    highestHigh,
-    lowestLow,
-    high,
-    low,
-    lastCandelIsGreen,
-  };
-  return data;
+    const { goodOne, avg, lastCandelHeight, allowedRange } = dayData;
+    const {
+      trend,
+      valid,
+      highestHigh,
+      lowestLow,
+      high,
+      low,
+      lastCandelIsGreen,
+      lastCandelHeight: lastHeight,
+      avgHeight,
+      currentPrice,
+    } = priceAction;
+    const data = {
+      instrument,
+      goodOne,
+      avgHeight,
+      lastHeight,
+      trend,
+      valid,
+      symbol,
+      avgCandelSize: avg,
+      todayCandelSize: lastCandelHeight,
+      allowedCandelSize: allowedRange,
+      highestHigh,
+      lowestLow,
+      high,
+      low,
+      lastCandelIsGreen,
+      currentPrice,
+    };
+    return data;
+  }
+  return null
 };
 function sleep(milliseconds) {
   const date = Date.now();
@@ -487,7 +520,7 @@ function sleep(milliseconds) {
   } while (currentDate - date < milliseconds);
 }
 
-export const getSwingStocks = async (trend = "UP") => {
+export const getSwingStocks = async (trend?: string) => {
   try {
     // sleep(30000)
 
@@ -497,36 +530,40 @@ export const getSwingStocks = async (trend = "UP") => {
     const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
 
     //  const finalStocks= swingStocks.filter(x=> symbols.includes(x))
-     const finalStocks = symbols;
+    const finalStocks = symbols;
     // const finalStocks= ["SWSOLAR","TV18BRDCST"]
     console.log("Total Stocks", finalStocks.length);
     for (let x of finalStocks) {
       try {
-        console.log(`Process(${finalStocks.indexOf(x)+1}/${ finalStocks.length}`);
+        console.log(
+          `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length}`
+        );
 
         const data = await getDetails(x);
+        if (data) {
+          if (
+            (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
+            (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
+          ) {
+            console.log("Data validated for " + x);
 
-        if (
-          (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
-          (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
-        ) {
-          console.log("Data validated for " + x);
-
-          if (data.valid) {
-            if (trend) {
-              if (data.trend.toUpperCase() === trend.toUpperCase()) {
+            if (data.valid && data.goodOne) {
+              if (trend) {
+                if (data.trend.toUpperCase() === trend.toUpperCase()) {
+                  console.log("Stock added in bag " + x);
+                  bag.push(data);
+                }
+              } else {
                 console.log("Stock added in bag " + x);
                 bag.push(data);
               }
-            } else {
-              bag.push(data);
             }
           }
         }
       } catch (error) {}
     }
     if (bag && bag.length > 0) {
-      console.log("Bag is ready");
+      console.log("Bag is ready with ", bag.map((x) => x.symbol).toString());
     } else {
       console.log("Better luck next time");
     }

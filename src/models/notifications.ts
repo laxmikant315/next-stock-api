@@ -4,6 +4,8 @@ const notificationSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     createDt:Date,
     instrument: String,
+    avgHeight:Number,
+    lastHeight:Number,
     goodOne: Boolean,
     trend: String,
     valid: Boolean,
@@ -11,6 +13,7 @@ const notificationSchema = new mongoose.Schema({
     avgCandelSize: Number,
     todayCandelSize: Number,
     allowedCandelSize: Number,
+    currentPrice:Number,
     highestHigh: {
         highest: Number,
         indexNo: Number,

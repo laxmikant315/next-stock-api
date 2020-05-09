@@ -24,7 +24,6 @@ class BullController implements IControllerBase {
     try {
       this.initRoutes();
       this.create();
-      console.log("Constructor");
 
       // Replace with your email
       webpush.setVapidDetails(
@@ -53,7 +52,7 @@ class BullController implements IControllerBase {
         );
       });
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data.message);
     }
   }
 
@@ -67,7 +66,6 @@ class BullController implements IControllerBase {
       },
       symbol: notification.symbol,
     });
-    // console.log(stock)
     if (!stock) {
       const notificationObj = new Notification({
         _id: mongoose.Types.ObjectId(),
@@ -83,7 +81,7 @@ class BullController implements IControllerBase {
 
   async getStocks() {
     try {
-      const data = await getSwingStocks("UP");
+      const data = await getSwingStocks();
       // console.log("process end");
       //  await console.log(job.data);
       // console.log(data);
