@@ -6,6 +6,7 @@ import moment = require("moment");
 
 import * as mongoose from "mongoose";
 import Notification from "../../models/notifications";
+import Subscription from "../../models/subscription";
 
 const webpush = require("web-push");
 
@@ -15,7 +16,7 @@ class BullController implements IControllerBase {
   cron = process.env.CRON_TIME || "22 18 * * *";
   myFirstQueue = new Bull("my-first-queue", this.REDIS_URL);
   myTimeQueue = new Bull("my-time-queue", this.REDIS_URL);
-  public subscriptionMain: any = [];
+
   publicVapidKey = process.env.PUBLIC_VAPID_KEY;
   privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
@@ -103,8 +104,9 @@ class BullController implements IControllerBase {
             body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
           });
 
-          if (this.subscriptionMain) {
-            for (let sub of this.subscriptionMain) {
+          const subscriptions = await Subscription.find();
+          if (subscriptions) {
+            for (let sub of subscriptions) {
               webpush.sendNotification(sub, payload).catch((error) => {
                 console.error(error.stack);
               });
@@ -148,8 +150,8 @@ class BullController implements IControllerBase {
         image: "https://source.unsplash.com/random/300×300",
         url: "https://youtube.com",
       });
-
-      for (let sub of this.subscriptionMain) {
+      const subscriptions = await Subscription.find();
+      for (let sub of subscriptions) {
         webpush.sendNotification(sub, payload).catch((error) => {
           console.error(error.stack);
         });
@@ -163,15 +165,22 @@ class BullController implements IControllerBase {
     this.router.post("/subscribe", async (req, res) => {
       const subscription = req.body;
 
-      const exists = this.subscriptionMain.find(
-        (x) =>
-          x.keys.auth === subscription.keys.auth &&
-          x.keys.p256dh === subscription.keys.p256dh
-      );
-        if(!exists){
-          this.subscriptionMain.push(req.body);
-        }
-        res.status(201).json({});
+      const exists = Subscription.find({
+        "keys.auth": subscription.keys.auth,
+        "keys.p256dh": subscription.keys.p256dh,
+      });
+
+      // const exists = this.subscriptionMain.find(
+      //   (x) =>
+      //     x.keys.auth === subscription.keys.auth &&
+      //     x.keys.p256dh === subscription.keys.p256dh
+      // );
+      if (!exists) {
+        const sub = new Subscription(subscription);
+        sub.save().then((x) => console.log("New Subscription added."));
+      }
+
+      res.status(201).json({});
       // const payload = JSON.stringify({
       //   title: "test",
       //   body: "This push is from Test",
