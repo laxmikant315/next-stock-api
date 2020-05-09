@@ -15,7 +15,7 @@ class BullController implements IControllerBase {
   cron = process.env.CRON_TIME || "22 18 * * *";
   myFirstQueue = new Bull("my-first-queue", this.REDIS_URL);
   myTimeQueue = new Bull("my-time-queue", this.REDIS_URL);
-  public subscriptionMain: any = "";
+  public subscriptionMain: any = [];
   publicVapidKey = process.env.PUBLIC_VAPID_KEY;
   privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
