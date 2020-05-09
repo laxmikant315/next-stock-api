@@ -101,11 +101,13 @@ class BullController implements IControllerBase {
             });
 
             if (this.subscriptionMain) {
+              for(let sub of this.subscriptionMain){
               webpush
-                .sendNotification(this.subscriptionMain, payload)
+                .sendNotification(sub, payload)
                 .catch((error) => {
                   console.error(error.stack);
                 });
+              }
             }
           }
         }
@@ -143,19 +145,24 @@ class BullController implements IControllerBase {
         title: "test",
         body: "This push is from Manual Push",
       });
-      webpush
-        .sendNotification(this.subscriptionMain, payload)
+
+
+      for(let sub of this.subscriptionMain){
+        webpush
+        .sendNotification(sub, payload)
         .catch((error) => {
           console.error(error.stack);
         });
 
       console.log("Test Notification Pushed.", payload);
+      }
+    
       res.end("Pushed");
     });
 
     this.router.post("/subscribe", async (req, res) => {
       const subscription = req.body;
-      this.subscriptionMain = req.body;
+      this.subscriptionMain.push(req.body);
       res.status(201).json({});
       const payload = JSON.stringify({
         title: "test",
