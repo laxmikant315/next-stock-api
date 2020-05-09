@@ -145,7 +145,7 @@ class BullController implements IControllerBase {
         title: "test",
         body: "This push is from Manual Push",
         image: 'https://source.unsplash.com/random/300×300',
-        data:'https://youtube.com'
+        url:'https://youtube.com'
       });
 
 
