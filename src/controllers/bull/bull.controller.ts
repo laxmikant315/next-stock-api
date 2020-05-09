@@ -33,7 +33,7 @@ class BullController implements IControllerBase {
         this.privateVapidKey
       );
 
-      this.getStocks();
+      // this.getStocks();
       //  this.insertNotification({symbol:"LAKSH",trend:"UP",goodOne:true,valid:true,avgCandelSize:12,allowedCandelSize:10,todayCandelSize:3,highestHigh:{index:50,highest:210}, lowestLow:{index:10,lowest:100}, high:{index:20,highest:170}, low:{index:35,lowest:150}});
 
       this.myTimeQueue.process((job) => {
@@ -165,11 +165,10 @@ class BullController implements IControllerBase {
     this.router.post("/subscribe", async (req, res) => {
       const subscription = req.body;
 
-      const exists = Subscription.find({
+      const exists = await Subscription.findOne({
         "keys.auth": subscription.keys.auth,
         "keys.p256dh": subscription.keys.p256dh,
-      });
-
+      }).exec();
       // const exists = this.subscriptionMain.find(
       //   (x) =>
       //     x.keys.auth === subscription.keys.auth &&
