@@ -46,7 +46,9 @@ class BullController implements IControllerBase {
 
       this.myFirstQueue.on("completed", (job, result) => {
         console.log(
-          `Cron Job completed with result on ${this.cron} , result=> ${JSON.stringify(result, null, 2)}`
+          `Cron Job completed with result on ${
+            this.cron
+          } , result=> ${JSON.stringify(result, null, 2)}`
         );
       });
     } catch (error) {
@@ -56,14 +58,16 @@ class BullController implements IControllerBase {
 
   async insertNotification(notification) {
     // Notification.find(x=>x.)
-    const today= moment();
-    const stock =await Notification.findOne({
-       createDt: {$gte: today.startOf('day').toDate(), $lt: today.endOf('day').toDate()},
+    const today = moment();
+    const stock = await Notification.findOne({
+      createDt: {
+        $gte: today.startOf("day").toDate(),
+        $lt: today.endOf("day").toDate(),
+      },
       symbol: notification.symbol,
     });
     // console.log(stock)
-    if(!stock){
-
+    if (!stock) {
       const notificationObj = new Notification({
         _id: mongoose.Types.ObjectId(),
         createDt: moment().format(),
@@ -71,10 +75,9 @@ class BullController implements IControllerBase {
       });
       notificationObj
         .save()
-        .then(() => console.log('Document inserted'))
+        .then(() => console.log("Document inserted"))
         .catch((error) => console.log(error));
     }
-
   }
 
   async getStocks() {
@@ -93,22 +96,20 @@ class BullController implements IControllerBase {
       if (data && data.length > 0) {
         for (let d of data) {
           // if (d.goodOne) {
-            this.insertNotification(d);
+          this.insertNotification(d);
 
-            const payload = JSON.stringify({
-              title: "Stock Update",
-              body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
-            });
+          const payload = JSON.stringify({
+            title: "Stock Update",
+            body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
+          });
 
-            if (this.subscriptionMain) {
-              for(let sub of this.subscriptionMain){
-              webpush
-                .sendNotification(sub, payload)
-                .catch((error) => {
-                  console.error(error.stack);
-                });
-              }
+          if (this.subscriptionMain) {
+            for (let sub of this.subscriptionMain) {
+              webpush.sendNotification(sub, payload).catch((error) => {
+                console.error(error.stack);
+              });
             }
+          }
           // }
         }
       }
@@ -144,28 +145,33 @@ class BullController implements IControllerBase {
       const payload = JSON.stringify({
         title: "test",
         body: "This push is from Manual Push",
-        image: 'https://source.unsplash.com/random/300×300',
-        url:'https://youtube.com'
+        image: "https://source.unsplash.com/random/300×300",
+        url: "https://youtube.com",
       });
 
-
-      for(let sub of this.subscriptionMain){
-        webpush
-        .sendNotification(sub, payload)
-        .catch((error) => {
+      for (let sub of this.subscriptionMain) {
+        webpush.sendNotification(sub, payload).catch((error) => {
           console.error(error.stack);
         });
 
-      console.log("Test Notification Pushed.", payload);
+        console.log("Test Notification Pushed.", payload);
       }
-    
+
       res.end("Pushed");
     });
 
     this.router.post("/subscribe", async (req, res) => {
       const subscription = req.body;
-      this.subscriptionMain.push(req.body);
-      res.status(201).json({});
+
+      const exists = this.subscriptionMain.find(
+        (x) =>
+          x.keys.auth === subscription.keys.auth &&
+          x.keys.p256dh === subscription.keys.p256dh
+      );
+        if(!exists){
+          this.subscriptionMain.push(req.body);
+        }
+        res.status(201).json({});
       // const payload = JSON.stringify({
       //   title: "test",
       //   body: "This push is from Test",
