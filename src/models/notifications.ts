@@ -2,6 +2,7 @@ import * as mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    type:String,
     createDt:Date,
     instrument: String,
     avgHeight:Number,

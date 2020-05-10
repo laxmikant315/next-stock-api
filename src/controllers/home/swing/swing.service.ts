@@ -1,13 +1,40 @@
 import * as swingStocks from "./swing-stocks.json";
-const csv = require("async-csv");
+import * as csv from "async-csv";
 import * as fs from "fs";
 import path = require("path");
 import * as instruments from "./instruments.json";
+
 import axios from "axios";
 import { env } from "process";
 import * as moment from "moment";
-
+import Notification from "../../../models/notifications";
+import * as margins from "../swing/margin.json";
 var dataMain: any = [];
+
+let todaysIntradayStock;
+export const getNifty100Stocks = async () => {
+  const obj = await axios
+    // .get('https://www.nseindia.com/content/indices/ind_nifty100list.csv')
+    .get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20100");
+
+  return obj.data.data;
+};
+export const deleteIntradayStocks = async () => {
+  todaysIntradayStock = [];
+  await Notification.deleteMany({ type: "intraday" });
+  console.log('Intraday stocks deleted')
+};
+export const getDailyVolatilitedStocks = async (dateNow: string) => {
+  const obj = await axios
+    // .get(`https://www.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`)
+    .get(
+      `https://archives.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`
+    );
+
+  // const data = this.fetchData();
+  const data = await csv.parse(obj.data);
+  return data;
+};
 
 export const getVolumeStocks = async (interval = "5minute") => {
   let scan_clause =
@@ -33,7 +60,8 @@ export const getVolumeStocks = async (interval = "5minute") => {
         },
       }
     )
-    .then((x) => x.data.data);
+    .then((x) => x.data.data)
+    .catch((e) => console.log(e.response.data.message));
 };
 
 export const readCSV = async (filePath: string) => {
@@ -303,6 +331,16 @@ const getPriceAction = async (
     }
   }
 
+  if (
+    !(
+      highestHigh.highest !== high.highest &&
+      lowestLow.lowest !== low.lowest &&
+      high.highest !== low.lowest
+    )
+  ) {
+    valid = false;
+  }
+
   const firstHourData = data.filter((x, i) => i < 12);
 
   const fhdHigh = getHighestHigh(firstHourData).highest;
@@ -466,16 +504,25 @@ const getLowestLow = (
   return { lowest, indexNo };
 };
 
-const getDetails = async (symbol: any) => {
+const getDetails = async (symbol: string, type: string) => {
   const instrument = getInsruments(symbol);
+  let interval = "",
+    intervalParent = "";
+  if (type === "swing") {
+    interval = "day";
+    intervalParent = "month";
+  } else if (type === "intraday") {
+    interval = "5minute";
+    intervalParent = "day";
+  }
 
-  const priceAction = await getPriceAction(instrument, "day");
+  const priceAction = await getPriceAction(instrument, interval);
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
-     priceAction.lastCandelHeight > priceAction.avgHeight*80/100
+    priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100
   ) {
-    const dayData = await getDayData(instrument, "month");
+    const dayData = await getDayData(instrument, intervalParent);
 
     const { goodOne, avg, lastCandelHeight, allowedRange } = dayData;
     const {
@@ -510,7 +557,7 @@ const getDetails = async (symbol: any) => {
     };
     return data;
   }
-  return null
+  return null;
 };
 function sleep(milliseconds) {
   const date = Date.now();
@@ -520,55 +567,114 @@ function sleep(milliseconds) {
   } while (currentDate - date < milliseconds);
 }
 
-export const getSwingStocks = async (trend?: string) => {
+const getTodaysIntradayStocks = async () => {
+  const nifty100 = await getNifty100Stocks().then((res) =>
+    res.map((x) => x.symbol)
+  );
+
+  const volatilitedStocks = await getDailyVolatilitedStocks(
+    process.env.LAST_TRADE_DAY
+  );
+
+  let niftyVolatilited = volatilitedStocks.filter((x) =>
+    nifty100.includes(x[1])
+  );
+
+  for (const x of niftyVolatilited) {
+    x.daily = x[6] * 100;
+  }
+
+  const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
+
+  const avg = sum / niftyVolatilited.length;
+
+  niftyVolatilited = niftyVolatilited
+
+    .filter((x) => x.daily > avg)
+    .sort((x, y) => {
+      return y.daily - x.daily;
+    });
+
+  for (let n of niftyVolatilited) {
+    n.margin = margins.find((y) => y.symbol === n[1])?.margin;
+  }
+  niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
+
+  return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
+};
+
+export const getIntradayStocks = () => {
+  getTodaysIntradayStocks().then(async (x) => {
+    todaysIntradayStock = x;
+    console.log("Intraday stocks are updated.");
+    const intradayStocks = await getSwingStocks("intraday");
+    console.log(intradayStocks);
+  });
+};
+
+export const getSwingStocks = async (type: string, trend?: string) => {
   try {
     // sleep(30000)
 
+    let interval = "";
+    if (type === "swing") {
+      interval = "day";
+    } else if (type === "intraday") {
+      interval = "5minute";
+    }
     const bag = [];
-    const volumedStocks = await getVolumeStocks("day");
-    console.log("In Swing Stock");
-    const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
 
-    //  const finalStocks= swingStocks.filter(x=> symbols.includes(x))
-    const finalStocks = symbols;
-    // const finalStocks= ["SWSOLAR","TV18BRDCST"]
-    console.log("Total Stocks", finalStocks.length);
-    for (let x of finalStocks) {
-      try {
-        console.log(
-          `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length}`
+    const volumedStocks = await getVolumeStocks(interval);
+    if (volumedStocks) {
+      const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
+      let finalStocks = symbols;
+
+      if (type === "intraday") {
+        finalStocks = symbols.filter((x) =>
+          todaysIntradayStock.map((y) => y.symbol).includes(x)
         );
+      }
+      //  const finalStocks= swingStocks.filter(x=> symbols.includes(x))
 
-        const data = await getDetails(x);
-        if (data) {
-          if (
-            (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
-            (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
-          ) {
-            console.log("Data validated for " + x);
+      // const finalStocks= ["SWSOLAR","TV18BRDCST"]
+      console.log("Total Stocks", finalStocks.length);
+      for (let x of finalStocks) {
+        try {
+          console.log(
+            `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length})`
+          );
 
-            if (data.valid && data.goodOne) {
-              if (trend) {
-                if (data.trend.toUpperCase() === trend.toUpperCase()) {
+          const data = await getDetails(x, type);
+          if (data) {
+            if (
+              (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
+              (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
+            ) {
+              console.log("Data validated for " + x);
+
+              if (data.valid && data.goodOne) {
+                if (trend) {
+                  if (data.trend.toUpperCase() === trend.toUpperCase()) {
+                    console.log("Stock added in bag " + x);
+                    bag.push(data);
+                  }
+                } else {
                   console.log("Stock added in bag " + x);
                   bag.push(data);
                 }
-              } else {
-                console.log("Stock added in bag " + x);
-                bag.push(data);
               }
             }
           }
-        }
-      } catch (error) {}
-    }
-    if (bag && bag.length > 0) {
-      console.log("Bag is ready with ", bag.map((x) => x.symbol).toString());
-    } else {
-      console.log("Better luck next time");
-    }
+        } catch (error) {}
+      }
+      if (bag && bag.length > 0) {
+        console.log("Bag is ready with ", bag.map((x) => x.symbol).toString());
+      } else {
+        console.log("Better luck next time");
+      }
 
-    return bag;
+      return bag;
+    }
 
     // return getDetails('TITAN')
   } catch (error) {

@@ -43,7 +43,7 @@ class HomeController implements IControllerBase {
   }
 
   public initRoutes() {
-    this.router.get("/", this.index);
+    // this.router.get("/", this.index);
     this.router.get("/notifications", this.notifications);
     this.router.get(
       "/api/swing/:trend",
@@ -63,9 +63,13 @@ class HomeController implements IControllerBase {
 
   notifications = async (req: Request, res: Response) => {
 
-    Notification.find().then(x=>res.send(x));
+    const type= req.query.type;
+    const query:any={};
+    if(type){
+      query.type=type
+    }
+    Notification.find(query).sort('-createDt').then(x=>res.send(x));
     
-   
   }
   index = async (req: Request, res: Response) => {
     // const todos = await (

@@ -21,7 +21,7 @@ const app = new App({
         bodyParser.json(),
         bodyParser.urlencoded({ extended: true }),
         loggerMiddleware,
-        cors()
+         cors("http://localhost:3000",{ credentials :  false})
        
     ]
 })

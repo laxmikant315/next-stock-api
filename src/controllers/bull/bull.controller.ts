@@ -1,7 +1,13 @@
 import IControllerBase from "../../interfaces/IControllerBase.interface";
 import Bull = require("bull");
 import * as express from "express";
-import { getSwingStocks } from "../../controllers/home/swing/swing.service";
+import {
+  getSwingStocks,
+  getDailyVolatilitedStocks,
+  getNifty100Stocks,
+  getIntradayStocks,
+  deleteIntradayStocks,
+} from "../../controllers/home/swing/swing.service";
 import moment = require("moment");
 
 import * as mongoose from "mongoose";
@@ -13,13 +19,21 @@ const webpush = require("web-push");
 class BullController implements IControllerBase {
   public router = express.Router();
   REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-  cron = process.env.CRON_TIME || "22 18 * * *";
-  myFirstQueue = new Bull("my-first-queue", this.REDIS_URL);
-  myTimeQueue = new Bull("my-time-queue", this.REDIS_URL);
+  cronSwing = process.env.CRON_SWING_TIME;
+  cronIntraday = process.env.CRON_INTRADAY_TIME;
+
+  swingQueue = new Bull("swing-queue", this.REDIS_URL);
+  intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
+  timeQueue = new Bull("time-queue", this.REDIS_URL);
+
+  dailyQueue = new Bull("daily-queue", this.REDIS_URL);
+
+  dailyEveningQueue = new Bull("daily-eveing-queue", this.REDIS_URL);
 
   publicVapidKey = process.env.PUBLIC_VAPID_KEY;
   privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 
+  todaysIntradayStock;
   constructor() {
     try {
       this.initRoutes();
@@ -32,56 +46,83 @@ class BullController implements IControllerBase {
         this.privateVapidKey
       );
 
-       this.getStocks();
+      // deleteIntradayStocks()
+      // getIntradayStocks();
+
+      setTimeout(()=>{
+        // this.getStocks("swing");
+      },30000)
+      // this.getStocks("intraday");
       //  this.insertNotification({symbol:"LAKSH",trend:"UP",goodOne:true,valid:true,avgCandelSize:12,allowedCandelSize:10,todayCandelSize:3,highestHigh:{index:50,highest:210}, lowestLow:{index:10,lowest:100}, high:{index:20,highest:170}, low:{index:35,lowest:150}});
 
-      this.myTimeQueue.process((job) => {
+      this.dailyQueue.process(() => {
+        getIntradayStocks();
+      });
+
+      this.dailyEveningQueue.process(()=>{
+        deleteIntradayStocks();
+      })
+
+      this.timeQueue.process((job) => {
         console.log(moment().format());
       });
 
-      this.myFirstQueue.process(async (job) => {
+      this.swingQueue.process(async (job) => {
         console.log("process started", job.data);
-        return this.getStocks();
+        return this.getStocks("swing");
       });
 
-      this.myFirstQueue.on("completed", (job, result) => {
+      this.intradayQueue.process(async (job) => {
+        console.log("Intraday job started", job.data);
+        return this.getStocks("intraday");
+      });
+
+      this.swingQueue.on("completed", (job, result) => {
         console.log(
           `Cron Job completed with result on ${
-            this.cron
+            this.cronSwing
           } , result=> ${JSON.stringify(result, null, 2)}`
         );
       });
     } catch (error) {
-      console.log(error.response.data.message);
+      console.log(error);
     }
   }
 
   async insertNotification(notification) {
     // Notification.find(x=>x.)
     const today = moment();
-    const stock = await Notification.findOne({
-      createDt: {
-        $gte: today.startOf("day").toDate(),
-        $lt: today.endOf("day").toDate(),
-      },
-      symbol: notification.symbol,
-    });
-    if (!stock) {
+    let allow = false;
+    if (notification.type === "swing") {
+      const stock = await Notification.findOne({
+        createDt: {
+          $gte: today.startOf("day").toDate(),
+          $lt: today.endOf("day").toDate(),
+        },
+        symbol: notification.symbol,
+      });
+      if (!stock) {
+        allow = true;
+      }
+    } else {
+      allow = true;
+    }
+
+    if (allow) {
       const notificationObj = new Notification({
         _id: mongoose.Types.ObjectId(),
         createDt: moment().format(),
         ...notification,
       });
-      notificationObj
-        .save()
-        .then(() => console.log("Document inserted"))
-        .catch((error) => console.log(error));
+      await notificationObj.save().catch((error) => console.log(error));
+      console.log("Document inserted");
+      return true;
     }
   }
 
-  async getStocks() {
+  async getStocks(type: string) {
     try {
-      const data = await getSwingStocks();
+      const data = await getSwingStocks(type);
       // console.log("process end");
       //  await console.log(job.data);
       // console.log(data);
@@ -94,22 +135,24 @@ class BullController implements IControllerBase {
       // ]
       if (data && data.length > 0) {
         for (let d of data) {
+          d.type = type;
           // if (d.goodOne) {
-          this.insertNotification(d);
+          if (this.insertNotification(d)) {
+            const payload = JSON.stringify({
+              title: "Stock Update",
+              body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
+            });
 
-          const payload = JSON.stringify({
-            title: "Stock Update",
-            body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
-          });
-
-          const subscriptions = await Subscription.find();
-          if (subscriptions) {
-            for (let sub of subscriptions) {
-              webpush.sendNotification(sub, payload).catch((error) => {
-                console.error(error.stack);
-              });
+            const subscriptions = await Subscription.find();
+            if (subscriptions) {
+              for (let sub of subscriptions) {
+                webpush.sendNotification(sub, payload).catch((error) => {
+                  console.error(error.stack);
+                });
+              }
             }
           }
+
           // }
         }
       }
@@ -120,15 +163,13 @@ class BullController implements IControllerBase {
     }
   }
   async create() {
-    const job1 = await this.myFirstQueue.add(
+    await this.swingQueue.add(
+      {},
       {
-        trend: "DOWN",
-      },
-      {
-        repeat: { cron: this.cron },
+        repeat: { cron: this.cronSwing },
       }
     );
-    const timeJob = await this.myTimeQueue.add(
+    await this.timeQueue.add(
       {
         data: "Time Print",
       },
@@ -136,6 +177,29 @@ class BullController implements IControllerBase {
         repeat: { every: 60000 },
       }
     );
+
+    await this.intradayQueue.add(
+      {},
+      {
+        repeat: { cron: this.cronIntraday },
+      }
+    );
+
+    await this.dailyQueue.add(
+      {},
+      {
+        repeat: { cron: process.env.CRON_DAILY },
+      }
+    );
+    await this.dailyEveningQueue.add(
+      {},
+      {
+        repeat: { cron: process.env.CRON_DAILY_EVENING },
+      }
+    );
+    
+
+
 
     console.log("Jobs Created");
   }

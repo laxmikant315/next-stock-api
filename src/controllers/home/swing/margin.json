@@ -1,0 +1,1610 @@
+[
+    {
+      "symbol": "3MINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "AARTIIND",
+      "margin": 3
+    },
+    {
+      "symbol": "ABB",
+      "margin": 3
+    },
+    {
+      "symbol": "ABFRL",
+      "margin": 3
+    },
+    {
+      "symbol": "ACC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ACE",
+      "margin": 3
+    },
+    {
+      "symbol": "ADANIENT",
+      "margin": 5
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "margin": 5
+    },
+    {
+      "symbol": "ADANIPOWER",
+      "margin": 5
+    },
+    {
+      "symbol": "AIAENG",
+      "margin": 3
+    },
+    {
+      "symbol": "AJANTPHARM",
+      "margin": 3
+    },
+    {
+      "symbol": "AKZOINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "ALBK",
+      "margin": 3
+    },
+    {
+      "symbol": "ALKEM",
+      "margin": 3
+    },
+    {
+      "symbol": "ALLCARGO",
+      "margin": 3
+    },
+    {
+      "symbol": "AMARAJABAT",
+      "margin": 12.5
+    },
+    {
+      "symbol": "AMBUJACEM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ANANTRAJ",
+      "margin": 3
+    },
+    {
+      "symbol": "APOLLOHOSP",
+      "margin": 5
+    },
+    {
+      "symbol": "APOLLOTYRE",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ARVIND",
+      "margin": 5
+    },
+    {
+      "symbol": "ASAHIINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "ASHOKLEY",
+      "margin": 5
+    },
+    {
+      "symbol": "ASIANPAINT",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ASTRAZEN",
+      "margin": 3
+    },
+    {
+      "symbol": "ATFL",
+      "margin": 3
+    },
+    {
+      "symbol": "ATUL",
+      "margin": 3
+    },
+    {
+      "symbol": "AUBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "AUROPHARMA",
+      "margin": 5
+    },
+    {
+      "symbol": "AUTOAXLES",
+      "margin": 3
+    },
+    {
+      "symbol": "AVANTIFEED",
+      "margin": 3
+    },
+    {
+      "symbol": "AXISBANK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BAJAJ-AUTO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BAJAJFINSV",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BAJAJHLDNG",
+      "margin": 3
+    },
+    {
+      "symbol": "BAJFINANCE",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BALKRISIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BALRAMCHIN",
+      "margin": 3
+    },
+    {
+      "symbol": "BANCOINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "BANKBARODA",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BANKBEES",
+      "margin": 10
+    },
+    {
+      "symbol": "BANKINDIA",
+      "margin": 5
+    },
+    {
+      "symbol": "BATAINDIA",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BBTC",
+      "margin": 3
+    },
+    {
+      "symbol": "BEL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BEML",
+      "margin": 3
+    },
+    {
+      "symbol": "BERGEPAINT",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BHARATFIN",
+      "margin": 3
+    },
+    {
+      "symbol": "BHARATFORG",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BHARTIARTL",
+      "margin": 5
+    },
+    {
+      "symbol": "BHEL",
+      "margin": 5
+    },
+    {
+      "symbol": "BIOCON",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BLUEDART",
+      "margin": 3
+    },
+    {
+      "symbol": "BOSCHLTD",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BPCL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BRITANNIA",
+      "margin": 12.5
+    },
+    {
+      "symbol": "BSE",
+      "margin": 3
+    },
+    {
+      "symbol": "BSOFT",
+      "margin": 5
+    },
+    {
+      "symbol": "CADILAHC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CANBK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CANFINHOME",
+      "margin": 3
+    },
+    {
+      "symbol": "CAPACITE",
+      "margin": 3
+    },
+    {
+      "symbol": "CASTROLIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CDSL",
+      "margin": 3
+    },
+    {
+      "symbol": "CEATLTD",
+      "margin": 3
+    },
+    {
+      "symbol": "CENTRUM",
+      "margin": 3
+    },
+    {
+      "symbol": "CENTURYPLY",
+      "margin": 3
+    },
+    {
+      "symbol": "CENTURYTEX",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CEREBRAINT",
+      "margin": 3
+    },
+    {
+      "symbol": "CESC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CGCL",
+      "margin": 3
+    },
+    {
+      "symbol": "CHENNPETRO",
+      "margin": 3
+    },
+    {
+      "symbol": "CHOLAFIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CHOLAHLDNG",
+      "margin": 3
+    },
+    {
+      "symbol": "CIPLA",
+      "margin": 12.5
+    },
+    {
+      "symbol": "COALINDIA",
+      "margin": 12.5
+    },
+    {
+      "symbol": "COCHINSHIP",
+      "margin": 3
+    },
+    {
+      "symbol": "COLPAL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CONCOR",
+      "margin": 12.5
+    },
+    {
+      "symbol": "COROMANDEL",
+      "margin": 3
+    },
+    {
+      "symbol": "CRISIL",
+      "margin": 3
+    },
+    {
+      "symbol": "CROMPTON",
+      "margin": 3
+    },
+    {
+      "symbol": "CUB",
+      "margin": 3
+    },
+    {
+      "symbol": "CUMMINSIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "CYIENT",
+      "margin": 3
+    },
+    {
+      "symbol": "DABUR",
+      "margin": 12.5
+    },
+    {
+      "symbol": "DALMIASUG",
+      "margin": 3
+    },
+    {
+      "symbol": "DBCORP",
+      "margin": 3
+    },
+    {
+      "symbol": "DCBBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "DELTACORP",
+      "margin": 3
+    },
+    {
+      "symbol": "DHAMPURSUG",
+      "margin": 3
+    },
+    {
+      "symbol": "DIAMONDYD",
+      "margin": 3
+    },
+    {
+      "symbol": "DISHTV",
+      "margin": 5
+    },
+    {
+      "symbol": "DIVISLAB",
+      "margin": 8.3
+    },
+    {
+      "symbol": "DLF",
+      "margin": 5
+    },
+    {
+      "symbol": "DMART",
+      "margin": 3
+    },
+    {
+      "symbol": "DREDGECORP",
+      "margin": 3
+    },
+    {
+      "symbol": "DRREDDY",
+      "margin": 5
+    },
+    {
+      "symbol": "ECLERX",
+      "margin": 3
+    },
+    {
+      "symbol": "EICHERMOT",
+      "margin": 12.5
+    },
+    {
+      "symbol": "EIDPARRY",
+      "margin": 3
+    },
+    {
+      "symbol": "EIHOTEL",
+      "margin": 3
+    },
+    {
+      "symbol": "ELECTCAST",
+      "margin": 3
+    },
+    {
+      "symbol": "EMAMILTD",
+      "margin": 3
+    },
+    {
+      "symbol": "ENGINERSIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "EQUITAS",
+      "margin": 5.6
+    },
+    {
+      "symbol": "ERIS",
+      "margin": 3
+    },
+    {
+      "symbol": "ESCORTS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "EXIDEIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "FEDERALBNK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "FEL",
+      "margin": 3
+    },
+    {
+      "symbol": "FINCABLES",
+      "margin": 3
+    },
+    {
+      "symbol": "FORTIS",
+      "margin": 3
+    },
+    {
+      "symbol": "FRETAIL",
+      "margin": 3
+    },
+    {
+      "symbol": "GAIL",
+      "margin": 5
+    },
+    {
+      "symbol": "GDL",
+      "margin": 3
+    },
+    {
+      "symbol": "GEPIL",
+      "margin": 3
+    },
+    {
+      "symbol": "GESHIP",
+      "margin": 3
+    },
+    {
+      "symbol": "GHCL",
+      "margin": 3
+    },
+    {
+      "symbol": "GILLETTE",
+      "margin": 3
+    },
+    {
+      "symbol": "GLAXO",
+      "margin": 3
+    },
+    {
+      "symbol": "GLENMARK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "GLOBUSSPR",
+      "margin": 3
+    },
+    {
+      "symbol": "GMBREW",
+      "margin": 3
+    },
+    {
+      "symbol": "GMRINFRA",
+      "margin": 5
+    },
+    {
+      "symbol": "GNFC",
+      "margin": 3
+    },
+    {
+      "symbol": "GODREJAGRO",
+      "margin": 3
+    },
+    {
+      "symbol": "GODREJCP",
+      "margin": 12.5
+    },
+    {
+      "symbol": "GODREJIND",
+      "margin": 3
+    },
+    {
+      "symbol": "GODREJPROP",
+      "margin": 3
+    },
+    {
+      "symbol": "GOLDBEES",
+      "margin": 10
+    },
+    {
+      "symbol": "GPPL",
+      "margin": 3
+    },
+    {
+      "symbol": "GRANULES",
+      "margin": 3
+    },
+    {
+      "symbol": "GRASIM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "GREAVESCOT",
+      "margin": 3
+    },
+    {
+      "symbol": "GSFC",
+      "margin": 3
+    },
+    {
+      "symbol": "GSKCONS",
+      "margin": 3
+    },
+    {
+      "symbol": "GSPL",
+      "margin": 3
+    },
+    {
+      "symbol": "GUJALKALI",
+      "margin": 3
+    },
+    {
+      "symbol": "GUJGASLTD",
+      "margin": 3
+    },
+    {
+      "symbol": "HAVELLS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HBLPOWER",
+      "margin": 3
+    },
+    {
+      "symbol": "HCLTECH",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HDFC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HDFCAMC",
+      "margin": 3
+    },
+    {
+      "symbol": "HDFCBANK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HDFCLIFE",
+      "margin": 3
+    },
+    {
+      "symbol": "HEIDELBERG",
+      "margin": 3
+    },
+    {
+      "symbol": "HEROMOTOCO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HEXAWARE",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HGS",
+      "margin": 3
+    },
+    {
+      "symbol": "HIKAL",
+      "margin": 3
+    },
+    {
+      "symbol": "HINDALCO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HINDCOPPER",
+      "margin": 3
+    },
+    {
+      "symbol": "HINDPETRO",
+      "margin": 9
+    },
+    {
+      "symbol": "HINDUNILVR",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HINDZINC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "HONAUT",
+      "margin": 3
+    },
+    {
+      "symbol": "IBULHSGFIN",
+      "margin": 3
+    },
+    {
+      "symbol": "ICICIBANK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ICICIGI",
+      "margin": 3
+    },
+    {
+      "symbol": "ICICINIFTY",
+      "margin": 3
+    },
+    {
+      "symbol": "ICICIPRULI",
+      "margin": 9
+    },
+    {
+      "symbol": "IDBI",
+      "margin": 3
+    },
+    {
+      "symbol": "IDEA",
+      "margin": 3
+    },
+    {
+      "symbol": "IDFC",
+      "margin": 3
+    },
+    {
+      "symbol": "IDFCFIRSTB",
+      "margin": 5
+    },
+    {
+      "symbol": "IEX",
+      "margin": 3
+    },
+    {
+      "symbol": "IGL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "INDHOTEL",
+      "margin": 3
+    },
+    {
+      "symbol": "INDIACEM",
+      "margin": 3
+    },
+    {
+      "symbol": "INDIANB",
+      "margin": 3
+    },
+    {
+      "symbol": "INDIGO",
+      "margin": 3
+    },
+    {
+      "symbol": "INDUSINDBK",
+      "margin": 5
+    },
+    {
+      "symbol": "INFIBEAM",
+      "margin": 3
+    },
+    {
+      "symbol": "INFRATEL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "INFY",
+      "margin": 5
+    },
+    {
+      "symbol": "INOXLEISUR",
+      "margin": 3
+    },
+    {
+      "symbol": "INTELLECT",
+      "margin": 3
+    },
+    {
+      "symbol": "IOC",
+      "margin": 8.3
+    },
+    {
+      "symbol": "IPCALAB",
+      "margin": 3
+    },
+    {
+      "symbol": "IRB",
+      "margin": 3
+    },
+    {
+      "symbol": "IRCTC",
+      "margin": 3
+    },
+    {
+      "symbol": "ITC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "JAICORPLTD",
+      "margin": 3
+    },
+    {
+      "symbol": "JAMNAAUTO",
+      "margin": 3
+    },
+    {
+      "symbol": "JAYSREETEA",
+      "margin": 3
+    },
+    {
+      "symbol": "JINDALSTEL",
+      "margin": 11
+    },
+    {
+      "symbol": "JKCEMENT",
+      "margin": 3
+    },
+    {
+      "symbol": "JKPAPER",
+      "margin": 3
+    },
+    {
+      "symbol": "JKTYRE",
+      "margin": 3
+    },
+    {
+      "symbol": "JMFINANCIL",
+      "margin": 3
+    },
+    {
+      "symbol": "JSWENERGY",
+      "margin": 3
+    },
+    {
+      "symbol": "JSWSTEEL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "JUBILANT",
+      "margin": 3
+    },
+    {
+      "symbol": "JUBLFOOD",
+      "margin": 5
+    },
+    {
+      "symbol": "JUSTDIAL",
+      "margin": 10
+    },
+    {
+      "symbol": "JYOTHYLAB",
+      "margin": 3
+    },
+    {
+      "symbol": "KAJARIACER",
+      "margin": 12.5
+    },
+    {
+      "symbol": "KALPATPOWR",
+      "margin": 3
+    },
+    {
+      "symbol": "KANSAINER",
+      "margin": 3
+    },
+    {
+      "symbol": "KARURVYSYA",
+      "margin": 3
+    },
+    {
+      "symbol": "KEC",
+      "margin": 3
+    },
+    {
+      "symbol": "KEI",
+      "margin": 3
+    },
+    {
+      "symbol": "KIRIINDUS",
+      "margin": 3
+    },
+    {
+      "symbol": "KOTAKBANK",
+      "margin": 12.5
+    },
+    {
+      "symbol": "KOTAKNIFTY",
+      "margin": 3
+    },
+    {
+      "symbol": "KSCL",
+      "margin": 3
+    },
+    {
+      "symbol": "KTKBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "L&TFH",
+      "margin": 11
+    },
+    {
+      "symbol": "LALPATHLAB",
+      "margin": 3
+    },
+    {
+      "symbol": "LIBERTSHOE",
+      "margin": 3
+    },
+    {
+      "symbol": "LICHSGFIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "LINCOLN",
+      "margin": 3
+    },
+    {
+      "symbol": "LIQUIDBEES",
+      "margin": 10
+    },
+    {
+      "symbol": "LT",
+      "margin": 12.5
+    },
+    {
+      "symbol": "LUPIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "M&M",
+      "margin": 12.5
+    },
+    {
+      "symbol": "M&MFIN",
+      "margin": 5
+    },
+    {
+      "symbol": "M50",
+      "margin": 3
+    },
+    {
+      "symbol": "MAHINDCIE",
+      "margin": 3
+    },
+    {
+      "symbol": "MAHLOG",
+      "margin": 3
+    },
+    {
+      "symbol": "MAHSEAMLES",
+      "margin": 3
+    },
+    {
+      "symbol": "MAJESCO",
+      "margin": 3
+    },
+    {
+      "symbol": "MANALIPETC",
+      "margin": 3
+    },
+    {
+      "symbol": "MANAPPURAM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MARICO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MARUTI",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MASFIN",
+      "margin": 3
+    },
+    {
+      "symbol": "MASTEK",
+      "margin": 3
+    },
+    {
+      "symbol": "MCDOWELL-N",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MCX",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MEGH",
+      "margin": 3
+    },
+    {
+      "symbol": "MFSL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MGL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MIDHANI",
+      "margin": 3
+    },
+    {
+      "symbol": "MINDAIND",
+      "margin": 3
+    },
+    {
+      "symbol": "MINDTREE",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MMTC",
+      "margin": 3
+    },
+    {
+      "symbol": "MOIL",
+      "margin": 3
+    },
+    {
+      "symbol": "MOLDTKPAC",
+      "margin": 3
+    },
+    {
+      "symbol": "MOTHERSUMI",
+      "margin": 5
+    },
+    {
+      "symbol": "MPHASIS",
+      "margin": 3
+    },
+    {
+      "symbol": "MRF",
+      "margin": 12.5
+    },
+    {
+      "symbol": "MRPL",
+      "margin": 3
+    },
+    {
+      "symbol": "MUNJALAU",
+      "margin": 3
+    },
+    {
+      "symbol": "MUTHOOTFIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NATCOPHARM",
+      "margin": 3
+    },
+    {
+      "symbol": "NATIONALUM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NAUKRI",
+      "margin": 3
+    },
+    {
+      "symbol": "NAVINFLUOR",
+      "margin": 3
+    },
+    {
+      "symbol": "NAVNETEDUL",
+      "margin": 3
+    },
+    {
+      "symbol": "NBCC",
+      "margin": 5
+    },
+    {
+      "symbol": "NCC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NESTLEIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NETWORK18",
+      "margin": 3
+    },
+    {
+      "symbol": "NFL",
+      "margin": 3
+    },
+    {
+      "symbol": "NH",
+      "margin": 3
+    },
+    {
+      "symbol": "NHPC",
+      "margin": 3
+    },
+    {
+      "symbol": "NIFTYBEES",
+      "margin": 10
+    },
+    {
+      "symbol": "NIITTECH",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NLCINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "NMDC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "NOCIL",
+      "margin": 3
+    },
+    {
+      "symbol": "NTPC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "OBEROIRLTY",
+      "margin": 3
+    },
+    {
+      "symbol": "OFSS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "OIL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "OMAXE",
+      "margin": 3
+    },
+    {
+      "symbol": "ONGC",
+      "margin": 12.5
+    },
+    {
+      "symbol": "ORIENTBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "ORIENTCEM",
+      "margin": 3
+    },
+    {
+      "symbol": "PAGEIND",
+      "margin": 5
+    },
+    {
+      "symbol": "PAPERPROD",
+      "margin": 3
+    },
+    {
+      "symbol": "PARAGMILK",
+      "margin": 3
+    },
+    {
+      "symbol": "PCJEWELLER",
+      "margin": 3
+    },
+    {
+      "symbol": "PEL",
+      "margin": 5
+    },
+    {
+      "symbol": "PERSISTENT",
+      "margin": 3
+    },
+    {
+      "symbol": "PETRONET",
+      "margin": 3
+    },
+    {
+      "symbol": "PFC",
+      "margin": 11
+    },
+    {
+      "symbol": "PFIZER",
+      "margin": 3
+    },
+    {
+      "symbol": "PGHH",
+      "margin": 3
+    },
+    {
+      "symbol": "PHILIPCARB",
+      "margin": 3
+    },
+    {
+      "symbol": "PHOENIXLTD",
+      "margin": 3
+    },
+    {
+      "symbol": "PIDILITIND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "PIIND",
+      "margin": 3
+    },
+    {
+      "symbol": "PNB",
+      "margin": 5
+    },
+    {
+      "symbol": "PNBGILTS",
+      "margin": 3
+    },
+    {
+      "symbol": "PNBHOUSING",
+      "margin": 3
+    },
+    {
+      "symbol": "POLYPLEX",
+      "margin": 3
+    },
+    {
+      "symbol": "POWERGRID",
+      "margin": 12.5
+    },
+    {
+      "symbol": "PRAJIND",
+      "margin": 3
+    },
+    {
+      "symbol": "PRESTIGE",
+      "margin": 3
+    },
+    {
+      "symbol": "PTC",
+      "margin": 3
+    },
+    {
+      "symbol": "PVR",
+      "margin": 12.5
+    },
+    {
+      "symbol": "QUICKHEAL",
+      "margin": 3
+    },
+    {
+      "symbol": "RADICO",
+      "margin": 3
+    },
+    {
+      "symbol": "RADIOCITY",
+      "margin": 3
+    },
+    {
+      "symbol": "RAJESHEXPO",
+      "margin": 3
+    },
+    {
+      "symbol": "RALLIS",
+      "margin": 3
+    },
+    {
+      "symbol": "RAMCOCEM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "RAMCOIND",
+      "margin": 3
+    },
+    {
+      "symbol": "RAYMOND",
+      "margin": 12.5
+    },
+    {
+      "symbol": "RBLBANK",
+      "margin": 5
+    },
+    {
+      "symbol": "RCF",
+      "margin": 3
+    },
+    {
+      "symbol": "RECLTD",
+      "margin": 12.5
+    },
+    {
+      "symbol": "RELAXO",
+      "margin": 3
+    },
+    {
+      "symbol": "RELIANCE",
+      "margin": 12.5
+    },
+    {
+      "symbol": "REPCOHOME",
+      "margin": 3
+    },
+    {
+      "symbol": "RICOAUTO",
+      "margin": 3
+    },
+    {
+      "symbol": "RIIL",
+      "margin": 3
+    },
+    {
+      "symbol": "RKFORGE",
+      "margin": 3
+    },
+    {
+      "symbol": "SAIL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "SALZERELEC",
+      "margin": 3
+    },
+    {
+      "symbol": "SANGHIIND",
+      "margin": 3
+    },
+    {
+      "symbol": "SANGHVIMOV",
+      "margin": 3
+    },
+    {
+      "symbol": "SANOFI",
+      "margin": 3
+    },
+    {
+      "symbol": "SBILIFE",
+      "margin": 3
+    },
+    {
+      "symbol": "SBIN",
+      "margin": 12.5
+    },
+    {
+      "symbol": "SCHAEFFLER",
+      "margin": 3
+    },
+    {
+      "symbol": "SCHNEIDER",
+      "margin": 3
+    },
+    {
+      "symbol": "SCI",
+      "margin": 3
+    },
+    {
+      "symbol": "SELAN",
+      "margin": 3
+    },
+    {
+      "symbol": "SEQUENT",
+      "margin": 3
+    },
+    {
+      "symbol": "SHREECEM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "SHRIRAMCIT",
+      "margin": 3
+    },
+    {
+      "symbol": "SIEMENS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "SIS",
+      "margin": 3
+    },
+    {
+      "symbol": "SJVN",
+      "margin": 3
+    },
+    {
+      "symbol": "SKFINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "SOBHA",
+      "margin": 3
+    },
+    {
+      "symbol": "SOLARINDS",
+      "margin": 3
+    },
+    {
+      "symbol": "SOUTHBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "SPARC",
+      "margin": 3
+    },
+    {
+      "symbol": "SRF",
+      "margin": 5
+    },
+    {
+      "symbol": "SRTRANSFIN",
+      "margin": 11
+    },
+    {
+      "symbol": "STAR",
+      "margin": 10
+    },
+    {
+      "symbol": "SUNDARMFIN",
+      "margin": 3
+    },
+    {
+      "symbol": "SUNDRMFAST",
+      "margin": 3
+    },
+    {
+      "symbol": "SUNPHARMA",
+      "margin": 5
+    },
+    {
+      "symbol": "SUNTECK",
+      "margin": 3
+    },
+    {
+      "symbol": "SUNTV",
+      "margin": 11
+    },
+    {
+      "symbol": "SUPREMEIND",
+      "margin": 3
+    },
+    {
+      "symbol": "SUVEN",
+      "margin": 3
+    },
+    {
+      "symbol": "SYNDIBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "SYNGENE",
+      "margin": 3
+    },
+    {
+      "symbol": "TAKE",
+      "margin": 3
+    },
+    {
+      "symbol": "TATACHEM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TATACOFFEE",
+      "margin": 3
+    },
+    {
+      "symbol": "TATACOMM",
+      "margin": 3
+    },
+    {
+      "symbol": "TATAELXSI",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TATAGLOBAL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TATAINVEST",
+      "margin": 3
+    },
+    {
+      "symbol": "TATAMOTORS",
+      "margin": 9
+    },
+    {
+      "symbol": "TATAMTRDVR",
+      "margin": 9
+    },
+    {
+      "symbol": "TATAPOWER",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TATASTEEL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TATASTLLP",
+      "margin": 3
+    },
+    {
+      "symbol": "TCI",
+      "margin": 3
+    },
+    {
+      "symbol": "TCS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TECHM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TEXRAIL",
+      "margin": 5
+    },
+    {
+      "symbol": "THERMAX",
+      "margin": 3
+    },
+    {
+      "symbol": "THOMASCOOK",
+      "margin": 1
+    },
+    {
+      "symbol": "THYROCARE",
+      "margin": 3
+    },
+    {
+      "symbol": "TIMETECHNO",
+      "margin": 3
+    },
+    {
+      "symbol": "TINPLATE",
+      "margin": 3
+    },
+    {
+      "symbol": "TITAN",
+      "margin": 5
+    },
+    {
+      "symbol": "TNPETRO",
+      "margin": 3
+    },
+    {
+      "symbol": "TNPL",
+      "margin": 3
+    },
+    {
+      "symbol": "TORNTPHARM",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TORNTPOWER",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TRENT",
+      "margin": 3
+    },
+    {
+      "symbol": "TRIDENT",
+      "margin": 3
+    },
+    {
+      "symbol": "TRIVENI",
+      "margin": 3
+    },
+    {
+      "symbol": "TTKPRESTIG",
+      "margin": 3
+    },
+    {
+      "symbol": "TV18BRDCST",
+      "margin": 3
+    },
+    {
+      "symbol": "TVSMOTOR",
+      "margin": 12.5
+    },
+    {
+      "symbol": "TWL",
+      "margin": 3
+    },
+    {
+      "symbol": "UBL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "UCOBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "UJJIVAN",
+      "margin": 5
+    },
+    {
+      "symbol": "ULTRACEMCO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "UNIONBANK",
+      "margin": 11
+    },
+    {
+      "symbol": "UNIVCABLES",
+      "margin": 3
+    },
+    {
+      "symbol": "UPL",
+      "margin": 12.5
+    },
+    {
+      "symbol": "USHAMART",
+      "margin": 3
+    },
+    {
+      "symbol": "VEDL",
+      "margin": 5
+    },
+    {
+      "symbol": "VGUARD",
+      "margin": 3
+    },
+    {
+      "symbol": "VIPIND",
+      "margin": 3
+    },
+    {
+      "symbol": "VOLTAS",
+      "margin": 12.5
+    },
+    {
+      "symbol": "VTL",
+      "margin": 3
+    },
+    {
+      "symbol": "WABCOINDIA",
+      "margin": 3
+    },
+    {
+      "symbol": "WELCORP",
+      "margin": 3
+    },
+    {
+      "symbol": "WELENT",
+      "margin": 3
+    },
+    {
+      "symbol": "WELSPUNIND",
+      "margin": 3
+    },
+    {
+      "symbol": "WHIRLPOOL",
+      "margin": 3
+    },
+    {
+      "symbol": "WIPRO",
+      "margin": 12.5
+    },
+    {
+      "symbol": "WONDERLA",
+      "margin": 3
+    },
+    {
+      "symbol": "YESBANK",
+      "margin": 3
+    },
+    {
+      "symbol": "ZEEL",
+      "margin": 3
+    },
+    {
+      "symbol": "IOB",
+      "margin": 3
+    }
+  ]
