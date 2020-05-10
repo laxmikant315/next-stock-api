@@ -21,10 +21,10 @@ class App {
   };
   constructor(appInit: { port: number; middleWares: any; controllers: any }) {
     this.app = express();
-
+    var allowedOrigins = "http://localhost:* https://next-5.herokuapp.com:*";
     const server = http.createServer(this.app);
     this.io = socketIo(server);
-    // this.io.origins('http://localhost:3000');
+    this.io.origins(allowedOrigins)
     let interval;
  
     this.io.on("connection", (socket) => {
