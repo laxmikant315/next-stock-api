@@ -13,6 +13,7 @@ import moment = require("moment");
 import * as mongoose from "mongoose";
 import Notification from "../../models/notifications";
 import Subscription from "../../models/subscription";
+import { sockets } from "../../app";
 
 const webpush = require("web-push");
 
@@ -49,9 +50,9 @@ class BullController implements IControllerBase {
       // deleteIntradayStocks()
       // getIntradayStocks();
 
-      setTimeout(()=>{
+      setTimeout(() => {
         // this.getStocks("swing");
-      },30000)
+      }, 30000);
       // this.getStocks("intraday");
       //  this.insertNotification({symbol:"LAKSH",trend:"UP",goodOne:true,valid:true,avgCandelSize:12,allowedCandelSize:10,todayCandelSize:3,highestHigh:{index:50,highest:210}, lowestLow:{index:10,lowest:100}, high:{index:20,highest:170}, low:{index:35,lowest:150}});
 
@@ -59,9 +60,9 @@ class BullController implements IControllerBase {
         getIntradayStocks();
       });
 
-      this.dailyEveningQueue.process(()=>{
+      this.dailyEveningQueue.process(() => {
         deleteIntradayStocks();
-      })
+      });
 
       this.timeQueue.process((job) => {
         console.log(moment().format());
@@ -138,6 +139,11 @@ class BullController implements IControllerBase {
           d.type = type;
           // if (d.goodOne) {
           if (this.insertNotification(d)) {
+
+            for (let socket of sockets) {
+              socket.emit("FromAPI", d);
+            }
+
             const payload = JSON.stringify({
               title: "Stock Update",
               body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
@@ -197,16 +203,13 @@ class BullController implements IControllerBase {
         repeat: { cron: process.env.CRON_DAILY_EVENING },
       }
     );
-    
-
-
 
     console.log("Jobs Created");
   }
 
   initRoutes() {
     this.router.get("/swing", async (req, res) => {
-      res.send(await this.getStocks('swing'))
+      res.send(await this.getStocks("swing"));
     });
     this.router.get("/push", async (req, res) => {
       const payload = JSON.stringify({
@@ -215,6 +218,46 @@ class BullController implements IControllerBase {
         image: "https://source.unsplash.com/random/300×300",
         url: "https://youtube.com",
       });
+
+      const test = {
+        createDt: {
+          $date: "2020-05-10T10:18:34.000Z",
+        },
+        instrument: "79873",
+        goodOne: true,
+        avgHeight: 13.495945945945943,
+        lastHeight: 10.899999999999977,
+        trend: "DOWN",
+        valid: true,
+        symbol: "HDFC",
+        avgCandelSize: 29.31,
+        todayCandelSize: 1.9,
+        allowedCandelSize: 20.52,
+        highestHigh: {
+          highest: 494.9,
+          indexNo: 0,
+        },
+        lowestLow: {
+          lowest: 254,
+          indexNo: 15,
+        },
+        high: {
+          highest: 331.95,
+          indexNo: 11,
+        },
+        low: {
+          lowest: 284.85,
+          indexNo: 8,
+        },
+        lastCandelIsGreen: false,
+        currentPrice: 366.1,
+        type: "swing",
+        __v: 0,
+      };
+      for (let socket of sockets) {
+        socket.emit("FromAPI", test);
+      }
+
       const subscriptions = await Subscription.find();
       for (let sub of subscriptions) {
         webpush.sendNotification(sub, payload).catch((error) => {

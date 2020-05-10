@@ -7,7 +7,7 @@ import HomeController from './controllers/home/home.controller'
 import { env } from 'process'
 import BullController from './controllers/bull/bull.controller'
 
-var cors = require('cors')
+const cors = require('cors')
 require('dotenv').config()
 
 
@@ -21,7 +21,7 @@ const app = new App({
         bodyParser.json(),
         bodyParser.urlencoded({ extended: true }),
         loggerMiddleware,
-        cors(["http://localhost:3000","https://next-5.herokuapp.com"],{ credentials :  false})
+        cors()
        
     ]
 })

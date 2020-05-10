@@ -6,6 +6,7 @@ import * as socketIo from "socket.io";
 const mongoose = require("mongoose");
 import { env } from "process";
 
+export const sockets = [];
 class App {
     
   
@@ -19,12 +20,11 @@ class App {
     socket.emit("FromAPI", response);
   
   };
+  server: http.Server;
   constructor(appInit: { port: number; middleWares: any; controllers: any }) {
     this.app = express();
-    var allowedOrigins = "http://localhost:* https://next-5.herokuapp.com:*";
-    const server = http.createServer(this.app);
-    this.io = socketIo(server);
-    this.io.origins(allowedOrigins)
+    this.server = http.createServer(this.app);
+    this.io = socketIo(this.server);
     let interval;
  
     this.io.on("connection", (socket) => {
@@ -32,7 +32,12 @@ class App {
       if (interval) {
         clearInterval(interval);
       }
-      interval = setInterval(() => this.getApiAndEmit(socket), 1000);
+
+      sockets.push(socket);
+      // interval = setInterval(() => this.getApiAndEmit(socket), 1000);
+      
+
+
       socket.on("disconnect", () => {
         console.log("Client disconnected");
         clearInterval(interval);
@@ -82,7 +87,7 @@ class App {
   }
 
   public listen() {
-    const server = this.app.listen(this.port, () => {
+    const server = this.server.listen(this.port, () => {
       console.log(`App listening on the http://localhost:${this.port}`);
     });
     server.timeout = 10000000;
