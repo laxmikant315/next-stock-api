@@ -23,7 +23,7 @@ class App {
     this.app = express();
 
     const server = http.createServer(this.app);
-    this.io = socketIo(server,{origins:"http://localhost:3000"});
+    this.io = socketIo(server);
     // this.io.origins('http://localhost:3000');
     let interval;
  

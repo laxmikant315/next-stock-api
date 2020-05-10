@@ -21,7 +21,7 @@ const app = new App({
         bodyParser.json(),
         bodyParser.urlencoded({ extended: true }),
         loggerMiddleware,
-         cors("http://localhost:3000",{ credentials :  false})
+         cors(["http://localhost:3000","https://next-5.herokuapp.com"],{ credentials :  false})
        
     ]
 })
