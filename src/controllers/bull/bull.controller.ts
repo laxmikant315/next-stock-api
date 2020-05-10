@@ -206,7 +206,7 @@ class BullController implements IControllerBase {
 
   initRoutes() {
     this.router.get("/swing", async (req, res) => {
-      res.send(await getSwingStocks('swing'))
+      res.send(await this.getStocks('swing'))
     });
     this.router.get("/push", async (req, res) => {
       const payload = JSON.stringify({
