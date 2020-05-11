@@ -16,13 +16,13 @@ export const getNifty100Stocks = async () => {
   const obj = await axios
     // .get('https://www.nseindia.com/content/indices/ind_nifty100list.csv')
     .get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20100");
-
+  console.log(JSON.stringify(obj.data,null,2))
   return obj.data.data;
 };
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
   await Notification.deleteMany({ type: "intraday" });
-  console.log('Intraday stocks deleted')
+  console.log("Intraday stocks deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
   const obj = await axios
@@ -568,53 +568,52 @@ function sleep(milliseconds) {
 }
 
 const getTodaysIntradayStocks = async () => {
-  const nifty100 = await getNifty100Stocks().then((res) =>
-    res.map((x) => x.symbol)
-  ).catch(e=>console.log('Failed to load nifty stocks.'));
+  const nifty100 = await getNifty100Stocks()
+    .then((res) => res.map((x) => x.symbol))
+    .catch((e) => console.log("Failed to load nifty stocks."));
+  if (nifty100) {
+    console.log("Nifty 100 loaded.", nifty100);
 
-  console.log('Nifty 100 loaded.')
+    const volatilitedStocks = await getDailyVolatilitedStocks(
+      process.env.LAST_TRADE_DAY
+    );
 
-  const volatilitedStocks = await getDailyVolatilitedStocks(
-    process.env.LAST_TRADE_DAY
-  );
+    console.log("Volatilited Stocks loaded.", volatilitedStocks);
 
-  console.log('Volatilited Stocks loaded.')
+    let niftyVolatilited = volatilitedStocks.filter((x) =>
+      nifty100.includes(x[1])
+    );
 
-  let niftyVolatilited = volatilitedStocks.filter((x) =>
-    nifty100.includes(x[1])
-  );
+    for (const x of niftyVolatilited) {
+      x.daily = x[6] * 100;
+    }
 
-  for (const x of niftyVolatilited) {
-    x.daily = x[6] * 100;
+    const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
+
+    const avg = sum / niftyVolatilited.length;
+
+    niftyVolatilited = niftyVolatilited
+
+      .filter((x) => x.daily > avg)
+      .sort((x, y) => {
+        return y.daily - x.daily;
+      });
+
+    for (let n of niftyVolatilited) {
+      n.margin = margins.find((y) => y.symbol === n[1])?.margin;
+    }
+    niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
+
+    return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
   }
-
-  const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
-
-  const avg = sum / niftyVolatilited.length;
-
-  niftyVolatilited = niftyVolatilited
-
-    .filter((x) => x.daily > avg)
-    .sort((x, y) => {
-      return y.daily - x.daily;
-    });
-
-  for (let n of niftyVolatilited) {
-    n.margin = margins.find((y) => y.symbol === n[1])?.margin;
-  }
-  niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
-
-
-
-  return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
 };
 
 export const getIntradayStocks = async () => {
   const stocks = await getTodaysIntradayStocks();
-    todaysIntradayStock = stocks;
-    console.log("Intraday stocks are updated.",stocks);
-    // const intradayStocks = await getSwingStocks("intraday");
-    // console.log(intradayStocks);
+  todaysIntradayStock = stocks;
+  console.log("Intraday stocks are updated.", stocks);
+  // const intradayStocks = await getSwingStocks("intraday");
+  // console.log(intradayStocks);
   return stocks;
 };
 
