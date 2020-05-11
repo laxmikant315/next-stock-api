@@ -572,9 +572,13 @@ const getTodaysIntradayStocks = async () => {
     res.map((x) => x.symbol)
   );
 
+  console.log('Nifty 100 loaded.')
+
   const volatilitedStocks = await getDailyVolatilitedStocks(
     process.env.LAST_TRADE_DAY
   );
+
+  console.log('Volatilited Stocks loaded.')
 
   let niftyVolatilited = volatilitedStocks.filter((x) =>
     nifty100.includes(x[1])
@@ -600,6 +604,8 @@ const getTodaysIntradayStocks = async () => {
   }
   niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
 
+
+
   return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
 };
 
@@ -607,8 +613,8 @@ export const getIntradayStocks = () => {
   getTodaysIntradayStocks().then(async (x) => {
     todaysIntradayStock = x;
     console.log("Intraday stocks are updated.");
-    const intradayStocks = await getSwingStocks("intraday");
-    console.log(intradayStocks);
+    // const intradayStocks = await getSwingStocks("intraday");
+    // console.log(intradayStocks);
   });
 };
 
