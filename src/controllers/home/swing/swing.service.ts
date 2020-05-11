@@ -14,9 +14,8 @@ var dataMain: any = [];
 let todaysIntradayStock;
 export const getNifty100Stocks = async () => {
     // .get('https://www.nseindia.com/content/indices/ind_nifty100list.csv')
-  const obj = await axios.get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20100").catch(e=>console.log('Nifty 100 Failed',e));
-  console.log(JSON.stringify(obj.data,null,2))
-  return obj.data.data;
+  return await axios.get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20100").then(x=>x.data.data).catch(e=>console.log('Nifty 100 Failed',e));
+
 };
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
