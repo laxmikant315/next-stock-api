@@ -211,6 +211,11 @@ class BullController implements IControllerBase {
     this.router.get("/swing", async (req, res) => {
       res.send(await this.getStocks("swing"));
     });
+    this.router.get("/intraday", async (req, res) => {
+      const stocks=  getIntradayStocks()
+      res.send(stocks);
+    });
+    
     this.router.get("/push", async (req, res) => {
       const payload = JSON.stringify({
         title: "test",

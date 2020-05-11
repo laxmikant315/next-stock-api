@@ -570,7 +570,7 @@ function sleep(milliseconds) {
 const getTodaysIntradayStocks = async () => {
   const nifty100 = await getNifty100Stocks().then((res) =>
     res.map((x) => x.symbol)
-  );
+  ).catch(e=>console.log('Failed to load nifty stocks.'));
 
   console.log('Nifty 100 loaded.')
 
@@ -609,13 +609,13 @@ const getTodaysIntradayStocks = async () => {
   return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
 };
 
-export const getIntradayStocks = () => {
-  getTodaysIntradayStocks().then(async (x) => {
-    todaysIntradayStock = x;
-    console.log("Intraday stocks are updated.");
+export const getIntradayStocks = async () => {
+  const stocks = await getTodaysIntradayStocks();
+    todaysIntradayStock = stocks;
+    console.log("Intraday stocks are updated.",stocks);
     // const intradayStocks = await getSwingStocks("intraday");
     // console.log(intradayStocks);
-  });
+  return stocks;
 };
 
 export const getSwingStocks = async (type: string, trend?: string) => {
