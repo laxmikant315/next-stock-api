@@ -190,7 +190,7 @@ export const getHistorical = async (
 
 const getPriceAction = async (
   instrumentToken: string,
-  interval = "5minute"
+  interval = "5minute",
 ) => {
   let from = "";
   if (interval === "5minute") {
@@ -245,7 +245,11 @@ const getPriceAction = async (
     );
   }
 
-  const latestCandel = data[data.length - 1];
+  let latestCandel = data[data.length - 1];
+  if(interval === "5minute"){
+
+    latestCandel = data[data.length - 2];
+  }
 
   // const firstHigh = Math.max(...dataFirst60.map(x => x[2]));
   const firstHigh = getHighestHigh(
