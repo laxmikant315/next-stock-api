@@ -672,7 +672,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
               console.log("Data validated for " + x);
-
+              console.log('Fetched data',data)
               if (data.valid && data.goodOne) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {
