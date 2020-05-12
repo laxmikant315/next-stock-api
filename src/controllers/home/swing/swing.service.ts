@@ -28,15 +28,15 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
     
  
   
-  
+  const obj = await axios
     // .get(`https://www.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`)
-    const data = await axios .get(
+    .get(
       `https://archives.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`
-    ).then(x=>x.data);
-  console.log('VL DATA,',data)
+    );
+  console.log('VL DATA,',obj.data)
   // const data = this.fetchData();
-  
-  return  await csv.parse(data);;  
+  const data = await csv.parse(obj.data);
+  return data;  
 } catch (error) {
   console.log('Failed to load daily volatilited stocks.');
 
@@ -639,11 +639,9 @@ export const getSwingStocks = async (type: string, trend?: string) => {
 
     const volumedStocks = await getVolumeStocks(interval);
     if (volumedStocks) {
-      
       const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
       let finalStocks = symbols;
-      console.log('Volumed Stocks',finalStocks);
-     
+
       if (type === "intraday") {
         finalStocks = symbols.filter((x) =>
           todaysIntradayStock.map((y) => y.symbol).includes(x)
