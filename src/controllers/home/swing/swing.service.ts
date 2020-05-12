@@ -24,6 +24,10 @@ export const deleteIntradayStocks = async () => {
   console.log("Intraday stocks deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
+  try {
+    
+ 
+  
   const obj = await axios
     // .get(`https://www.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`)
     .get(
@@ -32,7 +36,12 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
 
   // const data = this.fetchData();
   const data = await csv.parse(obj.data);
-  return data;
+  return data;  
+} catch (error) {
+  console.log('Failed to load daily volatilited stocks.');
+
+}
+   
 };
 
 export const getVolumeStocks = async (interval = "5minute") => {
