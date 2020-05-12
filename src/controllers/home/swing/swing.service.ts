@@ -686,7 +686,9 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               }
             }
           }
-        } catch (error) {}
+        } catch (error) {
+          console.log('Failed to get stock details',x, error)
+        }
       }
       if (bag && bag.length > 0) {
         console.log("Bag is ready with ", bag.map((x) => x.symbol).toString());
