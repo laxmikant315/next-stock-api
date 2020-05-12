@@ -12,6 +12,9 @@ import * as margins from "../swing/margin.json";
 import * as nifty100 from "../swing/nifty100.json";
 
 import * as volatility from "../swing/volatility.json";
+
+import AppSettings from "../../../models/app-settings";
+
 var dataMain: any = [];
 
 let todaysIntradayStock;
@@ -582,9 +585,14 @@ function sleep(milliseconds) {
 }
 
 const getTodaysIntradayStocks = async () => {
-  const nifty100 = await getNifty100Stocks().then((res) =>
-    res.map((x) => x.symbol)
-  );
+  // const nifty100 = await getNifty100Stocks().then((res) =>
+  //   res.map((x) => x.symbol)
+  // );
+
+  const appSettings  = await AppSettings.findOne().exec()
+
+  const nifty100 =appSettings["nifty100Stocks"];
+  const dailyVolitilityStocks =appSettings["dailyVolitilityStocks"];
 
   if (nifty100) {
     console.log("Nifty 100 loaded.", nifty100);
@@ -592,19 +600,17 @@ const getTodaysIntradayStocks = async () => {
     // const volatilitedStocks = await getDailyVolatilitedStocks(
     //   process.env.LAST_TRADE_DAY
     // );
-    const volatilitedStocks: any = volatility;
+    const volatilitedStocks: any = dailyVolitilityStocks;
 
     console.log("Volatilited Stocks loaded.");
 
     let niftyVolatilited = volatilitedStocks.filter((x) =>
-      nifty100.includes(x.Symbol)
+      nifty100.includes(x[1])
     );
 
     for (const x of niftyVolatilited) {
       x.daily =
-        +x[
-          "Current Day Underlying Daily Volatility (E) = Sqrt(0.94*D*D + 0.06*C*C)"
-        ] * 100;
+        +x[6] * 100;
     }
 
     const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
@@ -619,13 +625,13 @@ const getTodaysIntradayStocks = async () => {
       });
 
     for (let n of niftyVolatilited) {
-      n.margin = margins.find((y) => y.symbol === n.Symbol)?.margin;
+      n.margin = margins.find((y) => y.symbol === n[1])?.margin;
     }
     niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
 
     console.log("result", niftyVolatilited);
     const result = niftyVolatilited.map((x) => ({
-      symbol: x.Symbol,
+      symbol: x[1],
       margin: x.margin,
     }));
 
