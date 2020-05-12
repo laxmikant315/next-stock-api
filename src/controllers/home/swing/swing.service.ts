@@ -33,7 +33,7 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
     .get(
       `https://archives.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`
     );
-
+  console.log('VL DATA,',obj.data)
   // const data = this.fetchData();
   const data = await csv.parse(obj.data);
   return data;  
