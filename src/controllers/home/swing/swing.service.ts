@@ -28,9 +28,9 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
     
  
   
-  const data = await axios
+  
     // .get(`https://www.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`)
-    .get(
+    const data = await axios .get(
       `https://archives.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`
     ).then(x=>x.data);
   console.log('VL DATA,',data)
