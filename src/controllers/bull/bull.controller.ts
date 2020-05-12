@@ -139,7 +139,6 @@ class BullController implements IControllerBase {
           d.type = type;
           // if (d.goodOne) {
           if (this.insertNotification(d)) {
-
             for (let socket of sockets) {
               socket.emit("FromAPI", d);
             }
@@ -211,11 +210,16 @@ class BullController implements IControllerBase {
     this.router.get("/swing", async (req, res) => {
       res.send(await this.getStocks("swing"));
     });
-    this.router.get("/intraday", async (req, res) => {
-      const stocks=  await getIntradayStocks()
+    this.router.get("/setIntraday", async (req, res) => {
+      const stocks = await getIntradayStocks();
       res.send(stocks);
     });
-    
+    this.router.get("/intraday", async (req, res) => {
+      const stocks = await getSwingStocks("intraday");
+
+      res.send(stocks);
+    });
+
     this.router.get("/push", async (req, res) => {
       const payload = JSON.stringify({
         title: "test",
