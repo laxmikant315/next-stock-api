@@ -529,6 +529,9 @@ const getDetails = async (symbol: string, type: string) => {
   }
 
   const priceAction = await getPriceAction(instrument, interval);
+  if (type === "intraday") {
+  console.log('Price Action', priceAction)
+  }
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
