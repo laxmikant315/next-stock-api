@@ -666,13 +666,16 @@ export const getSwingStocks = async (type: string, trend?: string) => {
           );
 
           const data = await getDetails(x, type);
+          if(type==="intraday"){
+            console.log("Data ", data);
+          }
+         
           if (data) {
             if (
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
-              console.log("Data validated for " + x);
-              console.log('Fetched data',data)
+              console.log("Data validated");
               if (data.valid && data.goodOne) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {
