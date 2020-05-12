@@ -10,6 +10,8 @@ import * as moment from "moment";
 import Notification from "../../../models/notifications";
 import * as margins from "../swing/margin.json";
 import * as nifty100 from "../swing/nifty100.json";
+
+import * as volatility from "../swing/volatility.json";
 var dataMain: any = [];
 
 let todaysIntradayStock;
@@ -36,6 +38,8 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
   console.log('VL DATA,',obj.data)
   // const data = this.fetchData();
   const data = await csv.parse(obj.data);
+
+  
   return data;  
 } catch (error) {
   console.log('Failed to load daily volatilited stocks.');
@@ -582,37 +586,41 @@ const getTodaysIntradayStocks = async () => {
   if (nifty100) {
     console.log("Nifty 100 loaded.", nifty100);
 
-    const volatilitedStocks = await getDailyVolatilitedStocks(
-      process.env.LAST_TRADE_DAY
-    );
-
+    // const volatilitedStocks = await getDailyVolatilitedStocks(
+    //   process.env.LAST_TRADE_DAY
+    // );
+    const volatilitedStocks :any = volatility;
+    
     console.log("Volatilited Stocks loaded.");
 
     let niftyVolatilited = volatilitedStocks.filter((x) =>
-      nifty100.includes(x[1])
+      nifty100.includes(x.Symbol)
     );
-
+    
     for (const x of niftyVolatilited) {
-      x.daily = x[6] * 100;
+      x.daily = +x["Current Day Underlying Daily Volatility (E) = Sqrt(0.94*D*D + 0.06*C*C)"] * 100;
     }
 
     const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
-
+    console.log('sum',sum)
     const avg = sum / niftyVolatilited.length;
-
+    console.log('avg',avg)
     niftyVolatilited = niftyVolatilited
 
       .filter((x) => x.daily > avg)
       .sort((x, y) => {
         return y.daily - x.daily;
       });
-
+     
     for (let n of niftyVolatilited) {
-      n.margin = margins.find((y) => y.symbol === n[1])?.margin;
+      n.margin = margins.find((y) => y.symbol === n.Symbol)?.margin;
     }
     niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
 
-    return niftyVolatilited.map((x) => ({ symbol: x[1], margin: x.margin }));
+    console.log('result',niftyVolatilited)
+    const result =  niftyVolatilited.map((x) => ({ symbol: x.Symbol, margin: x.margin }));
+ 
+    return result
   }
 };
 
