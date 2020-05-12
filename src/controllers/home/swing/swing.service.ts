@@ -678,7 +678,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
           }
 
           if (data) {
-            if (
+            if ( type === "intraday" || 
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
