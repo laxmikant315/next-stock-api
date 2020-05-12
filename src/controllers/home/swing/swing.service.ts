@@ -367,7 +367,7 @@ const getPriceAction = async (
   }
 
   let lastCandelIsGreen = true;
-  if (latestCandel[1] < latestCandel[4]) {
+  if (latestCandel[1] > latestCandel[4]) {
     lastCandelIsGreen = false;
   }
 
