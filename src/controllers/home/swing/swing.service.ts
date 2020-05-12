@@ -639,9 +639,11 @@ export const getSwingStocks = async (type: string, trend?: string) => {
 
     const volumedStocks = await getVolumeStocks(interval);
     if (volumedStocks) {
+      
       const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
       let finalStocks = symbols;
-
+      console.log('Volumed Stocks',finalStocks);
+     
       if (type === "intraday") {
         finalStocks = symbols.filter((x) =>
           todaysIntradayStock.map((y) => y.symbol).includes(x)
