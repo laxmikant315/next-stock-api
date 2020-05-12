@@ -662,7 +662,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
       for (let x of finalStocks) {
         try {
           console.log(
-            `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length})`
+            `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length}) STOCK=>${x}`
           );
 
           const data = await getDetails(x, type);
