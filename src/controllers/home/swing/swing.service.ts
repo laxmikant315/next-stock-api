@@ -28,15 +28,15 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
     
  
   
-  const obj = await axios
+  const data = await axios
     // .get(`https://www.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`)
     .get(
       `https://archives.nseindia.com/archives/nsccl/volt/CMVOLT_${dateNow}.CSV`
-    );
-  console.log('VL DATA,',obj.data)
+    ).then(x=>x.data);
+  console.log('VL DATA,',data)
   // const data = this.fetchData();
-  const data = await csv.parse(obj.data);
-  return data;  
+  
+  return  await csv.parse(data);;  
 } catch (error) {
   console.log('Failed to load daily volatilited stocks.');
 
