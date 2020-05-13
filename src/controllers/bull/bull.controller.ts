@@ -3,8 +3,7 @@ import Bull = require("bull");
 import * as express from "express";
 import {
   getSwingStocks,
-  getDailyVolatilitedStocks,
-  getNifty100Stocks,
+
   getIntradayStocks,
   deleteIntradayStocks,
 } from "../../controllers/home/swing/swing.service";
@@ -61,6 +60,7 @@ class BullController implements IControllerBase {
       });
 
       this.dailyEveningQueue.process(async () => {
+        console.log("process dailyEveningQueue started");
         await deleteIntradayStocks();
       });
 

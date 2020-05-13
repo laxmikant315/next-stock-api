@@ -1,4 +1,4 @@
-import * as swingStocks from "./swing-stocks.json";
+
 import * as csv from "async-csv";
 import * as fs from "fs";
 import path = require("path");
@@ -9,21 +9,16 @@ import { env } from "process";
 import * as moment from "moment";
 import Notification from "../../../models/notifications";
 import * as margins from "../swing/margin.json";
-import * as nifty100 from "../swing/nifty100.json";
 
 import AppSettings from "../../../models/app-settings";
 
 var dataMain: any = [];
 
 let todaysIntradayStock;
-export const getNifty100Stocks = async () => {
-  // .get('https://www.nseindia.com/content/indices/ind_nifty100list.csv')
-  // return await axios.get("https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20100").then(x=>x.data.data).catch(e=>console.log('Nifty 100 Failed',e));
-  return nifty100.data;
-};
+
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
-  await Notification.deleteMany({ type: "intraday" });
+  await Notification.deleteMany({ type: "intraday" }).catch(e=>{console.log("Failed to delete intraday stocks.",e)});
   console.log("Intraday stocks deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
