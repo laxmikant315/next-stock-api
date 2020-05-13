@@ -8,8 +8,8 @@ html(lang="en")
         script(type="application/javascript" src="/client.js")
     body
        
+        h2(onclick=`alert('Nice try...')`)= `Welcome to STOCK API`
         
-        each d, index in notifications
-            h2(onclick=`alert(${index})`)= `${d.symbol} created ${d.trend.toLowerCase()} trend`
+      
 
            

@@ -11,8 +11,6 @@ import Notification from "../../../models/notifications";
 import * as margins from "../swing/margin.json";
 import * as nifty100 from "../swing/nifty100.json";
 
-import * as volatility from "../swing/volatility.json";
-
 import AppSettings from "../../../models/app-settings";
 
 var dataMain: any = [];
@@ -390,6 +388,7 @@ const getPriceAction = async (
     firstHourData: { fhdHigh, fhdLow },
     lastCandelIsGreen,
     avgHeight,
+    latestCandel,
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
   };
