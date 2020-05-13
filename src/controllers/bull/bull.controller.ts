@@ -60,8 +60,8 @@ class BullController implements IControllerBase {
         getIntradayStocks();
       });
 
-      this.dailyEveningQueue.process(() => {
-        deleteIntradayStocks();
+      this.dailyEveningQueue.process(async () => {
+        await deleteIntradayStocks();
       });
 
       this.timeQueue.process((job) => {
@@ -214,6 +214,12 @@ class BullController implements IControllerBase {
       const stocks = await getIntradayStocks();
       res.send(stocks);
     });
+    this.router.get("/intraday/delete", async (req, res) => {
+      const response = await deleteIntradayStocks();
+      res.send(response);
+    });
+
+
     this.router.get("/intradayStocks", async (req, res) => {
       const stocks = await this.getStocks("intraday");
 
