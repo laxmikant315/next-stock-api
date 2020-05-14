@@ -183,7 +183,23 @@ export const getHistorical = async (
       return null;
     });
 };
+const getLastestVolumendCandel= (data:any)=>{
+  const candelCount = 3;
+  let highVolumendCandel;
+  for(let i=0;i<candelCount;i++){
 
+     const candel= data[data.length-i+1];
+     if(highVolumendCandel ){
+      if(+candel[5] > +highVolumendCandel[5]){
+        highVolumendCandel=candel;
+      }
+     }else{
+      highVolumendCandel=candel;
+     }
+
+  }
+  return highVolumendCandel;
+}
 const getPriceAction = async (
   instrumentToken: string,
   interval = "5minute",
@@ -241,11 +257,14 @@ const getPriceAction = async (
     );
   }
 
-  let latestCandel = data[data.length - 1];
-  if(interval === "5minute"){
+  // let latestCandel = data[data.length - 1];
 
-    latestCandel = data[data.length - 2];
-  }
+  const latestCandel = getLastestVolumendCandel(data)
+  
+  // if(interval === "5minute"){
+
+  //   latestCandel = data[data.length - 2];
+  // }
 
   // const firstHigh = Math.max(...dataFirst60.map(x => x[2]));
   const firstHigh = getHighestHigh(
