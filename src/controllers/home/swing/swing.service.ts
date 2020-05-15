@@ -548,9 +548,11 @@ const getDetails = async (symbol: string, type: string) => {
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
-    (type === "intraday" ||
-      priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100)
-  ) {
+    //  (type === "intraday" ||
+      priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100 
+      // )
+  )
+   {
     const dayData = await getDayData(instrument, intervalParent);
 
     const { goodOne, avg, lastCandelHeight, allowedRange } = dayData;
