@@ -1,4 +1,3 @@
-
 import * as csv from "async-csv";
 import * as fs from "fs";
 import path = require("path");
@@ -18,7 +17,9 @@ let todaysIntradayStock;
 
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
-  await Notification.deleteMany({ type: "intraday" }).catch(e=>{console.log("Failed to delete intraday stocks.",e)});
+  await Notification.deleteMany({ type: "intraday" }).catch((e) => {
+    console.log("Failed to delete intraday stocks.", e);
+  });
   console.log("Intraday stocks deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
@@ -183,26 +184,24 @@ export const getHistorical = async (
       return null;
     });
 };
-const getLastestVolumendCandel= (data:any)=>{
+const getLastestVolumendCandel = (data: any) => {
   const candelCount = 3;
   let highVolumendCandel;
-  for(let i=0;i<candelCount;i++){
-
-     const candel= data[data.length-i+1];
-     if(highVolumendCandel ){
-      if(+candel[5] > +highVolumendCandel[5]){
-        highVolumendCandel=candel;
+  for (let i = 0; i < candelCount; i++) {
+    const candel = data[data.length - (i + 1)];
+    if (highVolumendCandel) {
+      if (+candel[5] > +highVolumendCandel[5]) {
+        highVolumendCandel = candel;
       }
-     }else{
-      highVolumendCandel=candel;
-     }
-
+    } else {
+      highVolumendCandel = candel;
+    }
   }
   return highVolumendCandel;
-}
+};
 const getPriceAction = async (
   instrumentToken: string,
-  interval = "5minute",
+  interval = "5minute"
 ) => {
   let from = "";
   if (interval === "5minute") {
@@ -259,8 +258,8 @@ const getPriceAction = async (
 
   // let latestCandel = data[data.length - 1];
 
-  const latestCandel = getLastestVolumendCandel(data)
-  
+  const latestCandel = getLastestVolumendCandel(data);
+
   // if(interval === "5minute"){
 
   //   latestCandel = data[data.length - 2];
@@ -602,10 +601,10 @@ const getTodaysIntradayStocks = async () => {
   //   res.map((x) => x.symbol)
   // );
 
-  const appSettings  = await AppSettings.findOne().exec()
+  const appSettings = await AppSettings.findOne().exec();
 
-  const nifty100 =appSettings["nifty100Stocks"];
-  const dailyVolitilityStocks =appSettings["dailyVolitilityStocks"];
+  const nifty100 = appSettings["nifty100Stocks"];
+  const dailyVolitilityStocks = appSettings["dailyVolitilityStocks"];
 
   if (nifty100) {
     console.log("Nifty 100 loaded.", nifty100);
@@ -622,8 +621,7 @@ const getTodaysIntradayStocks = async () => {
     );
 
     for (const x of niftyVolatilited) {
-      x.daily =
-        +x[6] * 100;
+      x.daily = +x[6] * 100;
     }
 
     const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
@@ -701,7 +699,8 @@ export const getSwingStocks = async (type: string, trend?: string) => {
           }
 
           if (data) {
-            if ( type === "intraday" || 
+            if (
+              type === "intraday" ||
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
