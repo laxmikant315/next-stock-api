@@ -111,8 +111,7 @@ class BullController implements IControllerBase {
 
     if (allow) {
       const notificationObj = new Notification({
-        _id: mongoose.Types.ObjectId(),
-        createDt: moment().format(),
+         createDt: moment().format(),
         ...notification,
       });
       await notificationObj.save().catch((error) => console.log(error));
@@ -266,7 +265,7 @@ class BullController implements IControllerBase {
         },
         lastCandelIsGreen: false,
         currentPrice: 366.1,
-        type: "swing",
+        type: "intraday",
         __v: 0,
       };
       for (let socket of sockets) {

@@ -2,7 +2,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
 import axios from "axios";
-import Notification from '../../models/notifications'
+import Notification from "../../models/notifications";
 
 import {
   getInsruments,
@@ -18,9 +18,6 @@ class HomeController implements IControllerBase {
     this.initRoutes();
     // this.connectApp();
     this.startKeepAlive();
-
-   
-
   }
   connectApp() {
     axios
@@ -43,7 +40,7 @@ class HomeController implements IControllerBase {
   }
 
   public initRoutes() {
-     this.router.get("/", this.index);
+    this.router.get("/", this.index);
     this.router.get("/notifications", this.notifications);
     this.router.get(
       "/api/swing/:trend",
@@ -54,24 +51,33 @@ class HomeController implements IControllerBase {
           body: "This push is from API",
         });
 
-        
         res.send(await getSwingStocks(trend));
       }
     );
   }
 
-
   notifications = async (req: Request, res: Response) => {
+    const type = req.query.type;
+    const limit = +req.query.limit | 0;
+    const skip = +req.query.offSet * limit;
+ 
 
-    const type= req.query.type;
-    const query:any={};
-    if(type){
-      query.type=type
+    const query: any = {};
+
+    if (type) {
+      query.type = type;
     }
-    Notification.find(query).sort('-createDt').then(x=>res.send(x));
-    
-  }
-  index =  (req: Request, res: Response) => {
+      const data = await Notification.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort("-createDt");
+
+      res.send({data,hasMoreItems: data.length === limit })
+
+  };
+
+
+  index = (req: Request, res: Response) => {
     // const todos = await (
     //   await axios.get("https://jsonplaceholder.typicode.com/todos")
     // ).data;
@@ -80,7 +86,7 @@ class HomeController implements IControllerBase {
 
     // const dbo = db.db("heroku_nmpf1dzg");
     // let notifications = await dbo.collection("notifications").find().toArray() ;
-   
+
     // db.close();
     // console.log(todos)
     // const todos = [
@@ -112,7 +118,7 @@ class HomeController implements IControllerBase {
       },
     ];
 
-    res.render("home/index", { users  });
+    res.render("home/index", { users });
   };
 }
 
