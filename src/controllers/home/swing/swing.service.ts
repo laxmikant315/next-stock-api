@@ -391,21 +391,29 @@ const getPriceAction = async (
   }
 
   let invalid = false;
-  if (trend === "UP") {
-    for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
-      if (data[i][3] < data[low.indexNo][3]) {
-        invalid = true;
+
+  if (valid) {
+    if (trend === "UP") {
+      if (highestHigh.indexNo < latestCandelIndex) {
+      for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
+        if (data[i] &&  data[i][3] < data[low.indexNo][3]) {
+          invalid = true;
+        }
       }
     }
-  } else if (trend === "DOWN") {
-    for (let i = lowestLow.indexNo; i >= latestCandelIndex; i++) {
-      if (data[i][2] > data[high.indexNo][2]) {
-        invalid = true;
+    } else if (trend === "DOWN") {
+     
+      if (lowestLow.indexNo < latestCandelIndex) {
+        for (let i = lowestLow.indexNo; i >= latestCandelIndex; i++) {
+          if (data[i] && data[i][2] > data[high.indexNo][2]) {
+            invalid = true;
+          }
+        }
       }
     }
   }
-  if(invalid){
-    valid= false;
+  if (invalid) {
+    valid = false;
   }
 
   let lastCandelIsGreen = true;
