@@ -7,7 +7,6 @@ import axios from "axios";
 import { env } from "process";
 import * as moment from "moment";
 import Notification from "../../../models/notifications";
-import * as margins from "../swing/margin.json";
 
 import AppSettings from "../../../models/app-settings";
 
@@ -636,51 +635,9 @@ const getTodaysIntradayStocks = async () => {
 
   const appSettings = await AppSettings.findOne().exec();
 
-  const nifty100 = appSettings["nifty100Stocks"];
-  const dailyVolitilityStocks = appSettings["dailyVolitilityStocks"];
+  const intradayStocks = appSettings["intradayStocks"];
 
-  if (nifty100) {
-    console.log("Nifty 100 loaded.", nifty100);
-
-    // const volatilitedStocks = await getDailyVolatilitedStocks(
-    //   process.env.LAST_TRADE_DAY
-    // );
-    const volatilitedStocks: any = dailyVolitilityStocks;
-
-    console.log("Volatilited Stocks loaded.");
-
-    let niftyVolatilited = volatilitedStocks.filter((x) =>
-      nifty100.includes(x[1])
-    );
-
-    for (const x of niftyVolatilited) {
-      x.daily = +x[6] * 100;
-    }
-
-    const sum = niftyVolatilited.map((x) => x.daily).reduce((x, y) => (x += y));
-    console.log("sum", sum);
-    const avg = sum / niftyVolatilited.length;
-    console.log("avg", avg);
-    niftyVolatilited = niftyVolatilited
-
-      .filter((x) => x.daily > avg)
-      .sort((x, y) => {
-        return y.daily - x.daily;
-      });
-
-    for (let n of niftyVolatilited) {
-      n.margin = margins.find((y) => y.symbol === n[1])?.margin;
-    }
-    niftyVolatilited = niftyVolatilited.filter((x) => x.margin >= 10);
-
-    console.log("result", niftyVolatilited);
-    const result = niftyVolatilited.map((x) => ({
-      symbol: x[1],
-      margin: x.margin,
-    }));
-
-    return result;
-  }
+  return intradayStocks
 };
 
 export const getIntradayStocks = async () => {
