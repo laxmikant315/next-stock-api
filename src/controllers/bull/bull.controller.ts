@@ -112,9 +112,10 @@ class BullController implements IControllerBase {
     if (allow) {
       const notificationObj = new Notification({
          createDt: moment().format(),
+         _id:mongoose.Types.ObjectId(),
         ...notification,
       });
-      await notificationObj.save().catch((error) => console.log(error));
+      await notificationObj.save().catch((error) => console.log('Failed to save notification',error));
       console.log("Document inserted");
       return true;
     }
