@@ -9,6 +9,7 @@ import * as moment from "moment";
 import Notification from "../../../models/notifications";
 
 import AppSettings from "../../../models/app-settings";
+import e = require("express");
 
 var dataMain: any = [];
 
@@ -394,14 +395,13 @@ const getPriceAction = async (
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
-      for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
-        if (data[i] &&  data[i][3] < data[low.indexNo][3]) {
-          invalid = true;
+        for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
+          if (data[i] && data[i][3] < data[low.indexNo][3]) {
+            invalid = true;
+          }
         }
       }
-    }
     } else if (trend === "DOWN") {
-     
       if (lowestLow.indexNo < latestCandelIndex) {
         for (let i = lowestLow.indexNo; i >= latestCandelIndex; i++) {
           if (data[i] && data[i][2] > data[high.indexNo][2]) {
@@ -411,6 +411,19 @@ const getPriceAction = async (
       }
     }
   }
+  if (valid) {
+    const previosCandel = data[latestCandelIndex - 1];
+    if (trend === "UP") {
+      if (previosCandel[2] > latestCandel[2]) {
+        invalid = true;
+      }
+    } else if (trend === "DOWN") {
+      if (previosCandel[3] < latestCandel[3]) {
+        invalid = true;
+      }
+    }
+  }
+
   if (invalid) {
     valid = false;
   }
@@ -637,7 +650,7 @@ const getTodaysIntradayStocks = async () => {
 
   const intradayStocks = appSettings["intradayStocks"];
 
-  return intradayStocks
+  return intradayStocks;
 };
 
 export const getIntradayStocks = async () => {
