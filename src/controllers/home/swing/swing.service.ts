@@ -191,9 +191,9 @@ const getLastestVolumendCandel = (data: any) => {
 
   for (let i = 0; i < candelCount; i++) {
     const idx = data.length - (i + 1);
-    const candelData = data[index];
+    const candelData = data[idx];
     if (candel) {
-      if (+candel[5] > +candel[5]) {
+      if (+candelData[5] > +candel[5]) {
         candel = candelData;
         index = idx;
       }
