@@ -13,8 +13,46 @@ import * as mongoose from "mongoose";
 import Notification from "../../models/notifications";
 import Subscription from "../../models/subscription";
 import { sockets } from "../../app";
+import ExpoPushToken from "../../models/ExpoPushToken";
+import axios from 'axios';
 
 const webpush = require("web-push");
+
+const testData = {
+  createDt: {
+    $date: "2020-05-10T10:18:34.000Z",
+  },
+  instrument: "79873",
+  goodOne: true,
+  avgHeight: 13.495945945945943,
+  lastHeight: 10.899999999999977,
+  trend: "DOWN",
+  valid: true,
+  symbol: "HDFC",
+  avgCandelSize: 29.31,
+  todayCandelSize: 1.9,
+  allowedCandelSize: 20.52,
+  highestHigh: {
+    highest: 494.9,
+    indexNo: 0,
+  },
+  lowestLow: {
+    lowest: 254,
+    indexNo: 15,
+  },
+  high: {
+    highest: 331.95,
+    indexNo: 11,
+  },
+  low: {
+    lowest: 284.85,
+    indexNo: 8,
+  },
+  lastCandelIsGreen: false,
+  currentPrice: 366.1,
+  type: "intraday",
+  __v: 0,
+};
 
 class BullController implements IControllerBase {
   public router = express.Router();
@@ -143,6 +181,8 @@ class BullController implements IControllerBase {
               socket.emit("FromAPI", d);
             }
 
+            pushOnApp(d)
+
             const payload = JSON.stringify({
               title: "Stock Update",
               body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
@@ -234,43 +274,9 @@ class BullController implements IControllerBase {
         url: "https://youtube.com",
       });
 
-      const test = {
-        createDt: {
-          $date: "2020-05-10T10:18:34.000Z",
-        },
-        instrument: "79873",
-        goodOne: true,
-        avgHeight: 13.495945945945943,
-        lastHeight: 10.899999999999977,
-        trend: "DOWN",
-        valid: true,
-        symbol: "HDFC",
-        avgCandelSize: 29.31,
-        todayCandelSize: 1.9,
-        allowedCandelSize: 20.52,
-        highestHigh: {
-          highest: 494.9,
-          indexNo: 0,
-        },
-        lowestLow: {
-          lowest: 254,
-          indexNo: 15,
-        },
-        high: {
-          highest: 331.95,
-          indexNo: 11,
-        },
-        low: {
-          lowest: 284.85,
-          indexNo: 8,
-        },
-        lastCandelIsGreen: false,
-        currentPrice: 366.1,
-        type: "intraday",
-        __v: 0,
-      };
+      
       for (let socket of sockets) {
-        socket.emit("FromAPI", test);
+        socket.emit("FromAPI", testData);
       }
 
       const subscriptions = await Subscription.find();
@@ -316,7 +322,85 @@ class BullController implements IControllerBase {
 
       // console.log("Test Pushed.", payload);
     });
+
+    this.router.post("/registerPush", async (req, res) => {
+
+      const {expoPushToken:token} = req.body;
+      const exists = await ExpoPushToken.findOne({
+        token
+      }).exec();
+
+      if (!exists) {
+        const sub = new ExpoPushToken({token});
+        sub.save().then((x) => console.log("New Expo Token added."));
+      }
+
+      res.status(201).json({});
+
+    });
+
+
+    this.router.get("/pushOnApp", async (req, res) => {
+
+      
+      await pushOnApp(testData);
+        res.status(201).json({});
+        // const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        //   method: 'POST',
+        //   headers: {
+        //     Accept: 'application/json',
+        //     'Accept-encoding': 'gzip, deflate',
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(message),
+        // });
+
+      });
+    
+    }
   }
-}
+
 
 export default BullController;
+
+
+const  pushOnApp=async(data?:any)=>{
+  const tokens :any= await ExpoPushToken.find();
+    for (let sub of tokens) {
+
+
+      
+      let message = {
+        to: sub.token,
+        sound: 'default',
+        title: 'Original Title',
+        body:  'And here is the body!',
+        data:{data:'Laxmikant'},
+        _displayInForeground: true,
+      };
+      if(data){
+         message = {
+          to: sub.token,
+          sound: 'default',
+          title:`${data.symbol} STOCK UPDATE`,
+          body:  `${data.symbol} created ${data.trend.toLowerCase()} trend`,
+          data:{data},
+          _displayInForeground: true,
+        };  
+      }
+
+
+      console.log(message);
+       await axios.post('https://exp.host/--/api/v2/push/send',
+      JSON.stringify(message),{
+        headers:{
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+        }
+      }
+      ).catch(x=>{
+        console.log('Could not send the notification',x)
+      })
+}
+}
