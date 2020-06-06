@@ -390,48 +390,75 @@ const getPriceAction = async (
     trend = "SIDEBASE";
   }
 
-  let invalid = false;
-
+ 
+  // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][3] < data[low.indexNo][3]) {
-            invalid = true;
+            valid = false;
           }
         }
       }
     } else if (trend === "DOWN") {
       if (lowestLow.indexNo < latestCandelIndex) {
-        for (let i = lowestLow.indexNo; i >= latestCandelIndex; i++) {
+        for (let i = lowestLow.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][2] > data[high.indexNo][2]) {
-            invalid = true;
+            valid = false;
           }
         }
       }
     }
   }
+   // Trend line validation End
+
+  // validate if previous candel of volumed candel is valid or invalid
   if (valid) {
     const previosCandel = data[latestCandelIndex - 1];
     if (trend === "UP") {
-      if (previosCandel[2] > latestCandel[2]) {
-        invalid = true;
+      if (previosCandel[2] > latestCandel[4]) {
+        valid = false;
       }
     } else if (trend === "DOWN") {
-      if (previosCandel[3] < latestCandel[3]) {
-        invalid = true;
+      if (previosCandel[3] < latestCandel[4]) {
+        valid = false;
       }
     }
   }
+  //end
 
-  if (invalid) {
-    valid = false;
-  }
 
+  // Calculate LastCandelIsGreen or red
   let lastCandelIsGreen = true;
   if (latestCandel[1] > latestCandel[4]) {
     lastCandelIsGreen = false;
   }
+
+  
+
+  // Trend Length Validation
+  if (valid) {
+    let a, b, c, d, e;
+    if (trend === "UP") {
+      a = lowestLow.indexNo;
+      b = high.indexNo;
+      c = low.indexNo;
+      d = highestHigh.indexNo;
+      e= latestCandelIndex
+    } else if (trend === "DOWN") {
+      a = highestHigh.indexNo;
+      b = low.indexNo;
+      c = high.indexNo;
+      d = lowestLow.indexNo;
+      e= latestCandelIndex
+    }
+
+    if(d-a < e-d){
+      valid = false;
+    }
+  }
+  // Trend Length Validation End
 
   return {
     highestHigh,
@@ -675,6 +702,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
     const bag = [];
 
     const volumedStocks = await getVolumeStocks(interval);
+
     if (volumedStocks) {
       const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
       let finalStocks = symbols;
