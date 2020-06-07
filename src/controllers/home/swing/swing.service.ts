@@ -87,8 +87,10 @@ export const getInsruments = (symbol?) => {
       const stock = (<any>instruments).find(
         (x) => x[2].toUpperCase() === symbol.toUpperCase() && x[11] === "NSE"
       );
-      if (stock) {
+      if (symbol && stock) {
         return stock[0];
+      }else{
+        return null;
       }
     }
     return instruments;
@@ -167,6 +169,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
+  
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
   return await axios
@@ -177,9 +180,14 @@ export const getHistorical = async (
     })
 
     .then((x) => {
+    
+      
       return x.data.data.candles;
     })
     .catch((error) => {
+     
+      
+      
       console.log(error.response.data.message);
       return null;
     });
@@ -216,10 +224,12 @@ const getPriceAction = async (
   }
 
   const data = await getHistorical(instrumentToken, interval, from);
+  
   let avgHeight = 0;
 
-  if (data) {
+  if (data && data.length) {
     let heightArr = [];
+    
     for (let d of data) {
       const height = Math.abs(d[1] - d[4]);
       heightArr.push(height);
@@ -265,6 +275,9 @@ const getPriceAction = async (
 
   const volumedCandel = getLastestVolumendCandel(data);
   const latestCandel = volumedCandel.candel;
+  if(!latestCandel){
+    return null;
+  }
   const latestCandelIndex = volumedCandel.index;
   // if(interval === "5minute"){
 
@@ -390,7 +403,6 @@ const getPriceAction = async (
     trend = "SIDEBASE";
   }
 
- 
   // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
@@ -411,7 +423,7 @@ const getPriceAction = async (
       }
     }
   }
-   // Trend line validation End
+  // Trend line validation End
 
   // validate if previous candel of volumed candel is valid or invalid
   if (valid) {
@@ -428,16 +440,15 @@ const getPriceAction = async (
   }
   //end
 
-
   // Calculate LastCandelIsGreen or red
   let lastCandelIsGreen = true;
-  if (latestCandel[1] > latestCandel[4]) {
+  if ( latestCandel && latestCandel[1] > latestCandel[4]) {
     lastCandelIsGreen = false;
   }
 
-  
 
-  // Trend Length Validation
+  // Trend Length Validation && Trend Line
+  const trendLine = [];
   if (valid) {
     let a, b, c, d, e;
     if (trend === "UP") {
@@ -445,21 +456,44 @@ const getPriceAction = async (
       b = high.indexNo;
       c = low.indexNo;
       d = highestHigh.indexNo;
-      e= latestCandelIndex
+      e = latestCandelIndex;
     } else if (trend === "DOWN") {
       a = highestHigh.indexNo;
       b = low.indexNo;
       c = high.indexNo;
       d = lowestLow.indexNo;
-      e= latestCandelIndex
+      e = latestCandelIndex;
     }
 
-    if(d-a < e-d){
+    if (d - a < e - d) {
       valid = false;
+    }
+    if (valid) {
+      
+      for (let i = a; i <= e; i++) {
+        const candel = data[i];
+        let candelAvg = (candel[1] + candel[2] + candel[3] + candel[4]) / 4;
+
+        if (trend === "UP") {
+          if (i === a || i === c) {
+            candelAvg = candel[3];
+          } else if (i === b || i === d || i > d) {
+            candelAvg = candel[2];
+          }
+        } else if (trend === "DOWN") {
+          if (i === a || i === c) {
+            candelAvg = candel[2];
+          } else if (i === b || i === d || i > d) {
+            candelAvg = candel[3];
+          }
+        }
+        trendLine.push(candelAvg);
+      }
     }
   }
   // Trend Length Validation End
 
+  
   return {
     highestHigh,
     lowestLow,
@@ -475,6 +509,7 @@ const getPriceAction = async (
     latestCandel,
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
+    trendLine
   };
 };
 
@@ -539,6 +574,7 @@ const getHighestHigh = (
   goingUp: any = false,
   indexHigh: any = 0
 ) => {
+  
   let highest,
     indexNo = 0;
   if (data[0]) {
@@ -602,6 +638,11 @@ const getLowestLow = (
 
 const getDetails = async (symbol: string, type: string) => {
   const instrument = getInsruments(symbol);
+
+  if(!instrument){
+    return null;
+  }
+
   let interval = "",
     intervalParent = "";
   if (type === "swing") {
@@ -613,15 +654,17 @@ const getDetails = async (symbol: string, type: string) => {
   }
 
   const priceAction = await getPriceAction(instrument, interval);
+  if(!priceAction){
+    return null;
+  }
   if (type === "intraday") {
     console.log("Price Action", priceAction);
   }
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
-    //  (type === "intraday" ||
     priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100
-    // )
+   
   ) {
     const dayData = await getDayData(instrument, intervalParent);
 
@@ -637,6 +680,7 @@ const getDetails = async (symbol: string, type: string) => {
       lastCandelHeight: lastHeight,
       avgHeight,
       currentPrice,
+      trendLine
     } = priceAction;
     const data = {
       instrument,
@@ -655,6 +699,7 @@ const getDetails = async (symbol: string, type: string) => {
       low,
       lastCandelIsGreen,
       currentPrice,
+      trendLine
     };
     return data;
   }
@@ -735,7 +780,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
-              console.log("Data validated");
+              
               if (data.valid && data.goodOne) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {

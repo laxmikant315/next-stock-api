@@ -15,6 +15,7 @@ const notificationSchema = new mongoose.Schema({
     todayCandelSize: Number,
     allowedCandelSize: Number,
     currentPrice:Number,
+    trendLine:Array,
     highestHigh: {
         highest: Number,
         indexNo: Number,
