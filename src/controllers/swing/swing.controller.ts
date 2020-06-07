@@ -74,7 +74,7 @@ class SwingController implements IControllerBase {
     res.send({ oldAmount, newAmount });
   };
   getSlots = async (req: Request, res: Response) => {
-    const slots = await Slot.find().exec();
+    const slots = await Slot.find().sort({createdOn:-1}).exec();
     res.send(slots);
   };
   getTransactions = async (req: Request, res: Response) => {
