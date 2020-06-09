@@ -39,10 +39,10 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
   }
 };
 
-const nifty200 = "46553",nifty100="33619";
+const nifty200 = "46553",
+  nifty100 = "33619";
 export const getVolumeStocks = async (interval = "5minute") => {
-  let scan_clause =
-    `%7B${nifty200}%7D+(+%5B+0+%5D+5+minute+volume+%3E+(+(+%5B+-1+%5D+5+minute+volume+%2B+%5B+-2+%5D+5+minute+volume+%2B+%5B+-3+%5D+5+minute+volume+)+%2F+3+)+*+2.5+)`;
+  let scan_clause = `%7B${nifty200}%7D+(+%5B+0+%5D+5+minute+volume+%3E+(+(+%5B+-1+%5D+5+minute+volume+%2B+%5B+-2+%5D+5+minute+volume+%2B+%5B+-3+%5D+5+minute+volume+)+%2F+3+)+*+2.5+)`;
   if (interval === "day") {
     scan_clause =
       "(+%7B57960%7D+(+latest+volume+%3E+(+(+1+day+ago+volume+%2B+2+days+ago+volume+%2B+3+days+ago+volume+%2B+4+days+ago+volume+%2B+5+days+ago+volume+)+%2F+5+)+*+3+)+)+";
@@ -90,7 +90,7 @@ export const getInsruments = (symbol?) => {
       );
       if (symbol && stock) {
         return stock[0];
-      }else{
+      } else {
         return null;
       }
     }
@@ -170,7 +170,6 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-  
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
   return await axios
@@ -181,14 +180,9 @@ export const getHistorical = async (
     })
 
     .then((x) => {
-    
-      
       return x.data.data.candles;
     })
     .catch((error) => {
-     
-      
-      
       console.log(error.response.data.message);
       return null;
     });
@@ -225,12 +219,12 @@ const getPriceAction = async (
   }
 
   const data = await getHistorical(instrumentToken, interval, from);
-  
+
   let avgHeight = 0;
 
   if (data && data.length) {
     let heightArr = [];
-    
+
     for (let d of data) {
       const height = Math.abs(d[1] - d[4]);
       heightArr.push(height);
@@ -276,7 +270,7 @@ const getPriceAction = async (
 
   const volumedCandel = getLastestVolumendCandel(data);
   const latestCandel = volumedCandel.candel;
-  if(!latestCandel){
+  if (!latestCandel) {
     return null;
   }
   const latestCandelIndex = volumedCandel.index;
@@ -385,6 +379,7 @@ const getPriceAction = async (
   ) {
     valid = false;
   }
+  let invalidReason = valid ? "" : "Price action is invalid";
 
   const firstHourData = data.filter((x, i) => i < 12);
 
@@ -403,8 +398,9 @@ const getPriceAction = async (
   ) {
     valid = false;
     trend = "SIDEBASE";
+    invalidReason="Side base trend"
   }
-  let invalidReason = ""
+
   // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
@@ -412,7 +408,6 @@ const getPriceAction = async (
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][3] < data[low.indexNo][3]) {
             valid = false;
-            
           }
         }
       }
@@ -425,8 +420,8 @@ const getPriceAction = async (
         }
       }
     }
-    if(!valid){
-      invalidReason="Trend line validation failed"
+    if (!valid) {
+      invalidReason = "Trend line validation failed";
     }
   }
   // Trend line validation End
@@ -443,18 +438,17 @@ const getPriceAction = async (
         valid = false;
       }
     }
-    if(!valid){
-      invalidReason="Previous candel of volumed candel is invalid."
+    if (!valid) {
+      invalidReason = "Previous candel of volumed candel is invalid.";
     }
   }
   //end
 
   // Calculate LastCandelIsGreen or red
   let lastCandelIsGreen = true;
-  if ( latestCandel && latestCandel[1] > latestCandel[4]) {
+  if (latestCandel && latestCandel[1] > latestCandel[4]) {
     lastCandelIsGreen = false;
   }
-
 
   // Trend Length Validation && Trend Line
   const trendLine = [];
@@ -476,12 +470,10 @@ const getPriceAction = async (
 
     if (d - a < e - d) {
       valid = false;
-     
-        invalidReason="Trend line and volumed candel distance is invalid."
-      
+
+      invalidReason = "Trend line and volumed candel distance is invalid.";
     }
     if (valid) {
-      
       for (let i = a; i <= e; i++) {
         const candel = data[i];
         let candelAvg = (candel[1] + candel[2] + candel[3] + candel[4]) / 4;
@@ -505,7 +497,6 @@ const getPriceAction = async (
   }
   // Trend Length Validation End
 
-  
   return {
     highestHigh,
     lowestLow,
@@ -522,7 +513,7 @@ const getPriceAction = async (
     latestCandel,
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
-    trendLine
+    trendLine,
   };
 };
 
@@ -587,7 +578,6 @@ const getHighestHigh = (
   goingUp: any = false,
   indexHigh: any = 0
 ) => {
-  
   let highest,
     indexNo = 0;
   if (data[0]) {
@@ -652,7 +642,7 @@ const getLowestLow = (
 const getDetails = async (symbol: string, type: string) => {
   const instrument = getInsruments(symbol);
 
-  if(!instrument){
+  if (!instrument) {
     return null;
   }
 
@@ -667,15 +657,16 @@ const getDetails = async (symbol: string, type: string) => {
   }
 
   const priceAction = await getPriceAction(instrument, interval);
-  if(!priceAction){
+  if (!priceAction) {
     return null;
   }
   if (type === "intraday") {
     console.log("Price Action", priceAction);
   }
-  const candelHeightIsValid =priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
-  if(!candelHeightIsValid){
-    console.log(`Volumed candel's height is invalid for stock ${symbol}`)
+  const candelHeightIsValid =
+    priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
+  if (!candelHeightIsValid) {
+    console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
   if (
     priceAction.currentPrice > 100 &&
@@ -696,7 +687,7 @@ const getDetails = async (symbol: string, type: string) => {
       lastCandelHeight: lastHeight,
       avgHeight,
       currentPrice,
-      trendLine
+      trendLine,
     } = priceAction;
     const data = {
       instrument,
@@ -715,7 +706,7 @@ const getDetails = async (symbol: string, type: string) => {
       low,
       lastCandelIsGreen,
       currentPrice,
-      trendLine
+      trendLine,
     };
     return data;
   }
@@ -797,7 +788,6 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
-              
               if (data.valid && data.goodOne) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {
