@@ -665,7 +665,8 @@ const getDetails = async (symbol: string, type: string) => {
   }
   const candelHeightIsValid =
     priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
-  if (!candelHeightIsValid) {
+    
+  if ( priceAction.currentPrice > 100 && priceAction.valid && !candelHeightIsValid) {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
   if (
