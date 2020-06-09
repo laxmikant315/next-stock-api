@@ -352,6 +352,7 @@ const getPriceAction = async (
   }
 
   let valid = false;
+
   let high = firstHigh,
     low = firstLow;
   const perGap60 = highLowLength * 0.6;
@@ -403,7 +404,7 @@ const getPriceAction = async (
     valid = false;
     trend = "SIDEBASE";
   }
-
+  let invalidReason = ""
   // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
@@ -411,6 +412,7 @@ const getPriceAction = async (
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][3] < data[low.indexNo][3]) {
             valid = false;
+            
           }
         }
       }
@@ -422,6 +424,9 @@ const getPriceAction = async (
           }
         }
       }
+    }
+    if(!valid){
+      invalidReason="Trend line validation failed"
     }
   }
   // Trend line validation End
@@ -437,6 +442,9 @@ const getPriceAction = async (
       if (previosCandel[3] < latestCandel[4]) {
         valid = false;
       }
+    }
+    if(!valid){
+      invalidReason="Previous candel of volumed candel is invalid."
     }
   }
   //end
@@ -468,6 +476,9 @@ const getPriceAction = async (
 
     if (d - a < e - d) {
       valid = false;
+     
+        invalidReason="Trend line and volumed candel distance is invalid."
+      
     }
     if (valid) {
       
@@ -504,6 +515,7 @@ const getPriceAction = async (
     per60,
     trend,
     valid,
+    invalidReason,
     firstHourData: { fhdHigh, fhdLow },
     lastCandelIsGreen,
     avgHeight,
@@ -661,11 +673,14 @@ const getDetails = async (symbol: string, type: string) => {
   if (type === "intraday") {
     console.log("Price Action", priceAction);
   }
+  const candelHeightIsValid =priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
+  if(!candelHeightIsValid){
+    console.log(`Volumed candel's height is invalid for stock ${symbol}`)
+  }
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
-    priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100
-   
+    candelHeightIsValid
   ) {
     const dayData = await getDayData(instrument, intervalParent);
 
@@ -762,6 +777,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
 
       // const finalStocks= ["SWSOLAR","TV18BRDCST"]
       console.log("Total Stocks", finalStocks.length);
+
       for (let x of finalStocks) {
         try {
           console.log(
