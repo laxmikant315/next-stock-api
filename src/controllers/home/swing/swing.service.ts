@@ -346,27 +346,53 @@ const getPriceAction = async (
   }
 
   let valid = false;
-
+  let invalidReason= "";
   let high = firstHigh,
     low = firstLow;
   const perGap60 = highLowLength * 0.6;
   if (trend == "DOWN") {
-    valid =
-      latestCandel[4] > lowestLow.lowest &&
-      latestCandel[4] < lowestLow.lowest + perGap60;
+
+    const val1 =  latestCandel[4] > lowestLow.lowest
+    const val2 =latestCandel[4] < lowestLow.lowest + perGap60;
+    valid = val1 && val2
+      
     low = firstLow;
     high = lastHigh;
-    if (data.length - 1 <= lowestLow.indexNo + 3) {
+    
+    if(!valid){
+      if(!val1){
+        invalidReason = "Current price is less than lowest";
+      }else if(!val2){  
+        invalidReason = "Gap 60 Validation failed";
+      }
+    }
+
+    
+    if (latestCandelIndex <= lowestLow.indexNo + 3) {
       valid = false;
+      invalidReason = "Volumed candel is very closed";
     }
   } else if (trend == "UP") {
-    valid =
-      latestCandel[4] < highestHigh.highest &&
-      latestCandel[4] > highestHigh.highest - perGap60;
+   
+     const val1 =   latestCandel[4] < highestHigh.highest 
+      const val2 = latestCandel[4] > highestHigh.highest - perGap60;
+      valid = val1 && val2
+
     high = firstHigh;
     low = lastLow;
+
+      
+    if(!valid){
+      if(!val1){
+        invalidReason = "Current price is greater than highest";
+      }else if(!val2){  
+        invalidReason = "Gap 60 Validation failed";
+      }
+    }
+
     if (data.length - 1 <= highestHigh.indexNo + 3) {
       valid = false;
+      invalidReason = "Volumed candel is very closed";
     }
   }
 
@@ -378,8 +404,13 @@ const getPriceAction = async (
     )
   ) {
     valid = false;
+
   }
-  let invalidReason = valid ? "" : "Price action is invalid";
+
+  if(!valid && !invalidReason){
+
+     invalidReason = "Price action is invalid";
+  }
 
   const firstHourData = data.filter((x, i) => i < 12);
 
