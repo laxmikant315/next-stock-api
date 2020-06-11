@@ -703,6 +703,9 @@ const getLowestLow = (
   return { lowest, indexNo };
 };
 
+const getPriceActionLength=(priceAction)=> Math.abs(priceAction.lowestLow.indexNo - priceAction.highestHigh.indexNo)
+
+
 const getDetails = async (symbol: string, type: string) => {
   const instrument = getInsruments(symbol);
 
@@ -731,7 +734,7 @@ const getDetails = async (symbol: string, type: string) => {
 
   let priceAction = await getPriceAction(data);
 
-  let secondTry = false;
+  let secondTry = {bit:false,priceActionLength:0,priceActionSecondLength:0};
   if(!priceAction.valid){
     let startIndex;
     if(priceAction.trend==="UP"){
@@ -740,9 +743,18 @@ const getDetails = async (symbol: string, type: string) => {
     }else if(priceAction.trend==="DOWN"){
       startIndex= priceAction.lowestLow.indexNo;
     }
+
+    const priceActionLength = getPriceActionLength(priceAction)
+
    const data2 = data.slice(startIndex,data.length);
-   priceAction = await getPriceAction(data2,true);
-   secondTry=true;
+   const priceActionSecond = await getPriceAction(data2,true);
+   
+   const priceActionSecondLength = getPriceActionLength(priceActionSecond)
+   if(priceActionSecond.valid && priceActionSecondLength>priceActionLength ){
+    priceAction= priceActionSecond
+    secondTry={bit:true,priceActionLength,priceActionSecondLength};
+   }
+   
   }
 
   
