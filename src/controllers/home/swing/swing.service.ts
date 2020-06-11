@@ -353,16 +353,21 @@ const getPriceAction = async (
     low = firstLow;
   const perGap60 = highLowLength * 0.6;
   if (trend == "DOWN") {
-
+    const val0 =  latestCandelIndex !== lowestLow.indexNo
     const val1 =  latestCandel[4] > lowestLow.lowest
     const val2 =latestCandel[4] < lowestLow.lowest + perGap60;
-    valid = val1 && val2
+
+    
+    valid = val0 && val1 && val2
       
     low = firstLow;
     high = lastHigh;
     
     if(!valid){
-      if(!val1){
+      if(!val0){
+        invalidReason = "Volumed candel is lowest low candel. Invalid price action";
+      }
+      else if(!val1){
         invalidReason = "Current price is less than lowest";
       }else if(!val2){  
         invalidReason = "Gap 60 Validation failed";
@@ -375,17 +380,20 @@ const getPriceAction = async (
       invalidReason = "Volumed candel is very closed";
     }
   } else if (trend == "UP") {
-   
+    const val0 =  latestCandelIndex !== highestHigh.indexNo
      const val1 =   latestCandel[4] < highestHigh.highest 
       const val2 = latestCandel[4] > highestHigh.highest - perGap60;
-      valid = val1 && val2
+      valid = val0 && val1 && val2
 
     high = firstHigh;
     low = lastLow;
 
       
     if(!valid){
-      if(!val1){
+      if(!val0){
+        invalidReason = "Volumed candel is highest high candel. Invalid price action";
+      }
+      else if(!val1){
         invalidReason = "Current price is greater than highest";
       }else if(!val2){  
         invalidReason = "Gap 60 Validation failed";
