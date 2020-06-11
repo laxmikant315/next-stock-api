@@ -707,7 +707,7 @@ const getDetails = async (symbol: string, type: string) => {
     console.log("Price Action", priceAction);
     try {
       
-    insertNotification({...priceAction,type:'priceaction'})
+    insertNotification({...priceAction,type:'priceaction',symbol})
     } catch (error) {
       
     }
