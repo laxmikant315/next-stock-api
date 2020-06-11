@@ -552,9 +552,11 @@ const getPriceAction = async (
     lastCandelIsGreen,
     avgHeight,
     latestCandel,
+    latestCandelIndex,
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
     trendLine,
+    
   };
 };
 
