@@ -22,7 +22,10 @@ export const deleteIntradayStocks = async () => {
   await Notification.deleteMany({ type: "intraday" }).catch((e) => {
     console.log("Failed to delete intraday stocks.", e);
   });
-  console.log("Intraday stocks deleted");
+  await Notification.deleteMany({ type: "priceaction" }).catch((e) => {
+    console.log("Failed to delete intraday Logs.", e);
+  });
+  console.log("Intraday stocks & logs deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
   try {
