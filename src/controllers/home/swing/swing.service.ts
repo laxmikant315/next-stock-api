@@ -695,8 +695,12 @@ const getDetails = async (symbol: string, type: string) => {
   }
   if (type === "intraday") {
     console.log("Price Action", priceAction);
-
+    try {
+      
     insertNotification({...priceAction,type:'priceaction'})
+    } catch (error) {
+      
+    }
   }
   const candelHeightIsValid =
     priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
