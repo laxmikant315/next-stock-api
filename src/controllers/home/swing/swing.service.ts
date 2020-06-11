@@ -212,6 +212,8 @@ const getLastestVolumendCandel = (data: any) => {
   }
   return { candel, index };
 };
+
+const getCandelIsGreen = (candel)=>   candel && candel[1] < candel[4]
 const getPriceAction = async (
   instrumentToken: string,
   interval = "5minute"
@@ -427,9 +429,31 @@ const getPriceAction = async (
 
   const firstHourData = data.filter((x, i) => i < 12);
 
-  const fhdHigh = getHighestHigh(firstHourData).highest;
-  const fhdLow = getLowestLow(firstHourData).lowest;
+  const fhdHighCandel = getHighestHigh(firstHourData);
+  const fhdLowCandel = getLowestLow(firstHourData);
 
+  // const fhdHigh = fhdHighCandel.highest;
+  // const fhdLow = fhdLowCandel.lowest;
+  
+
+  
+  let fhdHigh,fhdLow; //now fhdHigh is Only as per open close not as per high low
+  if(getCandelIsGreen(fhdHighCandel)){
+    fhdHigh=firstHourData[fhdHighCandel.indexNo][4];
+  
+  }else{
+    fhdHigh=firstHourData[fhdHighCandel.indexNo][1];
+  }
+
+  if(getCandelIsGreen(fhdLowCandel)){
+    fhdLow=firstHourData[fhdLowCandel.indexNo][1];
+  
+  }else{
+    fhdLow=firstHourData[fhdLowCandel.indexNo][4];
+  }
+  
+
+  
   if (
     !high ||
     !low ||
@@ -489,10 +513,7 @@ const getPriceAction = async (
   //end
 
   // Calculate LastCandelIsGreen or red
-  let lastCandelIsGreen = true;
-  if (latestCandel && latestCandel[1] > latestCandel[4]) {
-    lastCandelIsGreen = false;
-  }
+  let lastCandelIsGreen = getCandelIsGreen(latestCandel);
 
   // Trend Length Validation && Trend Line
   const trendLine = [];
