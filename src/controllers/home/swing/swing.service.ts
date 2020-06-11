@@ -215,17 +215,9 @@ const getLastestVolumendCandel = (data: any) => {
 
 const getCandelIsGreen = (candel)=>   candel && candel[1] < candel[4]
 const getPriceAction = async (
-  instrumentToken: string,
-  interval = "5minute"
+  data,secondTry=false
 ) => {
-  let from = "";
-  if (interval === "5minute") {
-    from = moment().format("YYYY-MM-DD") + "+09:15:00";
-  } else if (interval === "day") {
-    from = moment().add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
-  }
-
-  const data = await getHistorical(instrumentToken, interval, from);
+ 
 
   let avgHeight = 0;
 
@@ -427,47 +419,52 @@ const getPriceAction = async (
      invalidReason = "Price action is invalid";
   }
 
-  const firstHourData = data.filter((x, i) => i < 12);
 
-  const fhdHighCandel = getHighestHigh(firstHourData);
-  const fhdLowCandel = getLowestLow(firstHourData);
-
-  // const fhdHigh = fhdHighCandel.highest;
-  // const fhdLow = fhdLowCandel.lowest;
-  
-
-  
   let fhdHigh,fhdLow; //now fhdHigh is Only as per open close not as per high low
-  if(getCandelIsGreen(fhdHighCandel)){
-    fhdHigh=firstHourData[fhdHighCandel.indexNo][4];
-  
-  }else{
-    fhdHigh=firstHourData[fhdHighCandel.indexNo][1];
-  }
+  if(!secondTry){
+    const firstHourData = data.filter((x, i) => i < 12);
 
-  if(getCandelIsGreen(fhdLowCandel)){
-    fhdLow=firstHourData[fhdLowCandel.indexNo][1];
+    const fhdHighCandel = getHighestHigh(firstHourData);
+    const fhdLowCandel = getLowestLow(firstHourData);
   
-  }else{
-    fhdLow=firstHourData[fhdLowCandel.indexNo][4];
+    // const fhdHigh = fhdHighCandel.highest;
+    // const fhdLow = fhdLowCandel.lowest;
+    
+  
+    
+   
+    if(getCandelIsGreen(fhdHighCandel)){
+      fhdHigh=firstHourData[fhdHighCandel.indexNo][4];
+    
+    }else{
+      fhdHigh=firstHourData[fhdHighCandel.indexNo][1];
+    }
+  
+    if(getCandelIsGreen(fhdLowCandel)){
+      fhdLow=firstHourData[fhdLowCandel.indexNo][1];
+    
+    }else{
+      fhdLow=firstHourData[fhdLowCandel.indexNo][4];
+    }
+    
+  
+    
+    if (
+      !high ||
+      !low ||
+      (trend == "UP" &&
+        highestHigh.highest <= fhdHigh &&
+        lowestLow.lowest <= fhdLow) ||
+      (trend == "DOWN" &&
+        highestHigh.highest >= fhdHigh &&
+        lowestLow.lowest >= fhdLow)
+    ) {
+      valid = false;
+      trend = "SIDEBASE";
+      invalidReason="Side base trend"
+    }
   }
   
-
-  
-  if (
-    !high ||
-    !low ||
-    (trend == "UP" &&
-      highestHigh.highest <= fhdHigh &&
-      lowestLow.lowest <= fhdLow) ||
-    (trend == "DOWN" &&
-      highestHigh.highest >= fhdHigh &&
-      lowestLow.lowest >= fhdLow)
-  ) {
-    valid = false;
-    trend = "SIDEBASE";
-    invalidReason="Side base trend"
-  }
 
   // Trend line validation Start
   if (valid) {
@@ -723,7 +720,33 @@ const getDetails = async (symbol: string, type: string) => {
     intervalParent = "day";
   }
 
-  const priceAction = await getPriceAction(instrument, interval);
+  let from = "";
+  if (interval === "5minute") {
+    from = moment().format("YYYY-MM-DD") + "+09:15:00";
+  } else if (interval === "day") {
+    from = moment().add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
+  }
+
+  const data = await getHistorical(instrument, interval, from);
+
+  let priceAction = await getPriceAction(data);
+
+  let secondTry = false;
+  if(!priceAction.valid){
+    let startIndex;
+    if(priceAction.trend==="UP"){
+      startIndex= priceAction.highestHigh.indexNo;
+     
+    }else if(priceAction.trend==="DOWN"){
+      startIndex= priceAction.lowestLow.indexNo;
+    }
+   const data2 = data.slice(startIndex,data.length);
+   priceAction = await getPriceAction(data2,true);
+   secondTry=true;
+  }
+
+  
+
   if (!priceAction) {
     return null;
   }
@@ -784,6 +807,7 @@ const getDetails = async (symbol: string, type: string) => {
       lastCandelIsGreen,
       currentPrice,
       trendLine,
+      secondTry
     };
     return data;
   }

@@ -33,7 +33,8 @@ const notificationSchema = new mongoose.Schema({
         indexNo: Number,
     },
     lastCandelIsGreen: Boolean,
-    invalidReason:String
+    invalidReason:String,
+    secondTry:Boolean
 })
 
 export default mongoose.model('Notification',notificationSchema)
