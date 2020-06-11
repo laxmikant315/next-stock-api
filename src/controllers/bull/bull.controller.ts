@@ -6,15 +6,15 @@ import {
 
   getIntradayStocks,
   deleteIntradayStocks,
+  insertNotification,
 } from "../../controllers/home/swing/swing.service";
 import moment = require("moment");
 
-import * as mongoose from "mongoose";
-import Notification from "../../models/notifications";
 import Subscription from "../../models/subscription";
 import { sockets } from "../../app";
 import ExpoPushToken from "../../models/ExpoPushToken";
 import axios from 'axios';
+
 
 const webpush = require("web-push");
 
@@ -128,36 +128,7 @@ class BullController implements IControllerBase {
     }
   }
 
-  async insertNotification(notification) {
-    // Notification.find(x=>x.)
-    const today = moment();
-    let allow = false;
-    if (notification.type === "swing") {
-      const stock = await Notification.findOne({
-        createDt: {
-          $gte: today.startOf("day").toDate(),
-          $lt: today.endOf("day").toDate(),
-        },
-        symbol: notification.symbol,
-      });
-      if (!stock) {
-        allow = true;
-      }
-    } else {
-      allow = true;
-    }
 
-    if (allow) {
-      const notificationObj = new Notification({
-         createDt: moment().format(),
-         _id:mongoose.Types.ObjectId(),
-        ...notification,
-      });
-      await notificationObj.save().catch((error) => console.log('Failed to save notification',error));
-      console.log("Document inserted");
-      return true;
-    }
-  }
 
   async getStocks(type: string) {
     try {
@@ -176,7 +147,7 @@ class BullController implements IControllerBase {
         for (let d of data) {
           d.type = type;
           // if (d.goodOne) {
-          if (this.insertNotification(d)) {
+          if (insertNotification(d)) {
             for (let socket of sockets) {
               socket.emit("FromAPI", d);
             }

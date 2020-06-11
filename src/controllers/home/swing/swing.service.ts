@@ -9,6 +9,8 @@ import * as moment from "moment";
 import Notification from "../../../models/notifications";
 
 import AppSettings from "../../../models/app-settings";
+
+import * as mongoose from "mongoose";
 import e = require("express");
 
 var dataMain: any = [];
@@ -693,6 +695,8 @@ const getDetails = async (symbol: string, type: string) => {
   }
   if (type === "intraday") {
     console.log("Price Action", priceAction);
+
+    insertNotification({...priceAction,type:'priceaction'})
   }
   const candelHeightIsValid =
     priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
@@ -700,6 +704,9 @@ const getDetails = async (symbol: string, type: string) => {
   if ( priceAction.currentPrice > 100 && priceAction.valid && !candelHeightIsValid) {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
+
+  
+
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
@@ -763,6 +770,37 @@ const getTodaysIntradayStocks = async () => {
 
   return intradayStocks;
 };
+
+export  const insertNotification= async(notification) =>{
+  // Notification.find(x=>x.)
+  const today = moment();
+  let allow = false;
+  if (notification.type === "swing") {
+    const stock = await Notification.findOne({
+      createDt: {
+        $gte: today.startOf("day").toDate(),
+        $lt: today.endOf("day").toDate(),
+      },
+      symbol: notification.symbol,
+    });
+    if (!stock) {
+      allow = true;
+    }
+  } else {
+    allow = true;
+  }
+
+  if (allow) {
+    const notificationObj = new Notification({
+       createDt: moment().format(),
+       _id:mongoose.Types.ObjectId(),
+      ...notification,
+    });
+    await notificationObj.save().catch((error) => console.log('Failed to save notification',error));
+    console.log("Document inserted");
+    return true;
+  }
+}
 
 export const getIntradayStocks = async () => {
   const stocks = await getTodaysIntradayStocks();
