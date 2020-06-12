@@ -200,6 +200,9 @@ const getLastestVolumendCandel = (data: any) => {
   for (let i = 0; i < candelCount; i++) {
     const idx = data.length - (i + 1);
     const candelData = data[idx];
+    if(!candelData){
+      return null;
+    }
     if (candel) {
       if (+candelData[5] > +candel[5]) {
         candel = candelData;
@@ -273,6 +276,9 @@ const getPriceAction = async (
   // let latestCandel = data[data.length - 1];
 
   const volumedCandel = getLastestVolumendCandel(data);
+  if(!volumedCandel){
+    return null;
+  }
   const latestCandel = volumedCandel.candel;
   if (!latestCandel) {
     return null;
