@@ -382,7 +382,7 @@ const getPriceAction = async (
       }
     }
 
-    if(latestCandelIndex===lowestLow.indexNo){
+    if(latestCandelIndex<=lowestLow.indexNo){
       valid = false;
       invalidReason = "Trend is on bottom, movement pending";
     }
@@ -410,7 +410,7 @@ const getPriceAction = async (
         invalidReason = "Gap 60 Validation failed";
       }
     }
-    if(latestCandelIndex===highestHigh.indexNo){
+    if(latestCandelIndex<=highestHigh.indexNo){
       valid = false;
       invalidReason = "Trend is on top, movement pending";
     }
@@ -808,7 +808,7 @@ const getDetails = async (symbol: string, type: string) => {
     }
   }
   const candelHeightIsValid =
-    priceAction.lastCandelHeight > (priceAction.avgHeight * 80) / 100;
+    priceAction.lastCandelHeight > (priceAction.avgHeight * 60) / 100;
     
   if ( priceAction.currentPrice > 100 && priceAction.valid && !candelHeightIsValid) {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
