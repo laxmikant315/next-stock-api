@@ -382,8 +382,11 @@ const getPriceAction = async (
       }
     }
 
-    
-    if (latestCandelIndex <= lowestLow.indexNo + 3) {
+    if(latestCandelIndex===lowestLow.indexNo){
+      valid = false;
+      invalidReason = "Trend is on bottom, movement pending";
+    }
+    else if (latestCandelIndex <= lowestLow.indexNo + 3) {
       valid = false;
       invalidReason = "Volumed candel is very closed";
     }
@@ -407,8 +410,11 @@ const getPriceAction = async (
         invalidReason = "Gap 60 Validation failed";
       }
     }
-
-    if (data.length - 1 <= highestHigh.indexNo + 3) {
+    if(latestCandelIndex===highestHigh.indexNo){
+      valid = false;
+      invalidReason = "Trend is on top, movement pending";
+    }
+    else if (data.length - 1 <= highestHigh.indexNo + 3) {
       valid = false;
       invalidReason = "Volumed candel is very closed";
     }
@@ -503,9 +509,26 @@ const getPriceAction = async (
   // Trend line validation End
 
   // validate if previous candel of volumed candel is valid or invalid
+
+// Calculate LastCandelIsGreen or red
+let lastCandelIsGreen = getCandelIsGreen(latestCandel);
+
+
+  if(valid){
+    if (trend === "UP" && !lastCandelIsGreen) {
+      valid = false;
+      invalidReason = "Opposite trend volumed candel";
+    }
+    else if (trend === "DOWN" && lastCandelIsGreen) {
+      valid = false;
+      invalidReason = "Opposite trend volumed candel";
+    }
+  }
+
   if (valid) {
     const previosCandel = data[latestCandelIndex - 1];
     if (trend === "UP") {
+
       if (previosCandel[2] > latestCandel[4]) {
         valid = false;
       }
@@ -520,8 +543,7 @@ const getPriceAction = async (
   }
   //end
 
-  // Calculate LastCandelIsGreen or red
-  let lastCandelIsGreen = getCandelIsGreen(latestCandel);
+  
 
   // Trend Length Validation && Trend Line
   const trendLine = [];
