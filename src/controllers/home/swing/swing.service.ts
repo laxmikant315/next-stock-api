@@ -769,6 +769,7 @@ const getDetails = async (symbol: string, type: string) => {
 
   let secondTry = {bit:false,priceActionLength:0,priceActionSecondLength:0};
   if(priceAction && !priceAction.valid){
+
     let startIndex;
     if(priceAction.trend==="UP"){
       startIndex= priceAction.highestHigh.indexNo;
@@ -781,12 +782,14 @@ const getDetails = async (symbol: string, type: string) => {
 
    const data2 = data.slice(startIndex,data.length);
    const priceActionSecond = await getPriceAction(data2,true);
-   
-   const priceActionSecondLength = getPriceActionLength(priceActionSecond)
-   if(priceActionSecond && priceActionSecond.valid && priceActionSecondLength>priceActionLength ){
-    priceAction= priceActionSecond
-    secondTry={bit:true,priceActionLength,priceActionSecondLength};
+   if(priceActionSecond){
+    const priceActionSecondLength = getPriceActionLength(priceActionSecond)
+    if(priceActionSecond && priceActionSecond.valid && priceActionSecondLength>priceActionLength ){
+     priceAction= priceActionSecond
+     secondTry={bit:true,priceActionLength,priceActionSecondLength};
+    }
    }
+   
    
   }
 
