@@ -221,6 +221,11 @@ const getPriceAction = async (
 
   let avgHeight = 0;
 
+
+  if(!data){
+    return null;
+  }
+
   if (data && data.length) {
     let heightArr = [];
 
@@ -735,7 +740,7 @@ const getDetails = async (symbol: string, type: string) => {
   let priceAction = await getPriceAction(data);
 
   let secondTry = {bit:false,priceActionLength:0,priceActionSecondLength:0};
-  if(!priceAction.valid){
+  if(priceAction && !priceAction.valid){
     let startIndex;
     if(priceAction.trend==="UP"){
       startIndex= priceAction.highestHigh.indexNo;
@@ -750,7 +755,7 @@ const getDetails = async (symbol: string, type: string) => {
    const priceActionSecond = await getPriceAction(data2,true);
    
    const priceActionSecondLength = getPriceActionLength(priceActionSecond)
-   if(priceActionSecond.valid && priceActionSecondLength>priceActionLength ){
+   if(priceActionSecond && priceActionSecond.valid && priceActionSecondLength>priceActionLength ){
     priceAction= priceActionSecond
     secondTry={bit:true,priceActionLength,priceActionSecondLength};
    }
