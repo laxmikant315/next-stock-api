@@ -175,7 +175,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-  // return mockData.data.candles;
+  //  return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
@@ -326,6 +326,7 @@ const getPriceAction = async (data, secondTry = false) => {
       goingUp,
       goingUp ? firstLow.indexNo + 1 : lowestLow.indexNo
     );
+
   } else {
     // const firstHighCandelIndex = data.indexOf(data.find(x => x[2] === firstHigh));
 
@@ -340,22 +341,31 @@ const getPriceAction = async (data, secondTry = false) => {
   }
 
   let trend = "SIDEBASE";
+
+  let high = firstHigh,
+  low = firstLow;
+
   if (
     highestHigh.highest > lastHigh.highest &&
     lowestLow.lowest < firstLow.lowest
   ) {
     trend = "DOWN";
+
+    low = firstLow;
+    high = lastHigh;
+
+
   } else if (
     highestHigh.highest > firstHigh.highest &&
     lowestLow.lowest < lastLow.lowest
   ) {
     trend = "UP";
+    high = firstHigh;
+    low = lastLow;
   }
 
-  let valid = false;
+  let valid = true;
   let invalidReason = "";
-  let high = firstHigh,
-    low = firstLow;
 
   // Trend Length Validation && Trend Line
   const trendLine = [];
@@ -374,11 +384,13 @@ const getPriceAction = async (data, secondTry = false) => {
     d = lowestLow.indexNo;
     e = latestCandelIndex;
   }
+  const peak = d - a ;
+  const volumned = e - d;
+  if (peak< volumned) {
 
-  if (d - a < e - d) {
     valid = false;
 
-    invalidReason = "volumed candel distance from Trend Peak is invalid.";
+    invalidReason = `volumed candel distance from Trend Peak is invalid.peak:${peak},volumned:${volumned}`;
   }
 
   for (let i = a; i <= e; i++) {
@@ -411,8 +423,7 @@ const getPriceAction = async (data, secondTry = false) => {
 
       valid = val0 && val1 && val2;
 
-      low = firstLow;
-      high = lastHigh;
+ 
 
       if (!valid) {
         if (!val0) {
@@ -438,8 +449,7 @@ const getPriceAction = async (data, secondTry = false) => {
       const val2 = latestCandel[4] > highestHigh.highest - perGap60;
       valid = val0 && val1 && val2;
 
-      high = firstHigh;
-      low = lastLow;
+   
 
       if (!valid) {
         if (!val0) {
@@ -460,7 +470,6 @@ const getPriceAction = async (data, secondTry = false) => {
       }
     }
   }
-
   if (
     !(
       highestHigh.highest !== high.highest &&
@@ -513,6 +522,24 @@ const getPriceAction = async (data, secondTry = false) => {
     }
   }
 
+
+  // validate if previous candel of volumed candel is valid or invalid
+
+  // Calculate LastCandelIsGreen or red
+  let lastCandelIsGreen = getCandelIsGreen(latestCandel);
+
+  if (valid) {
+    if (trend === "UP" && !lastCandelIsGreen) {
+      valid = false;
+      invalidReason = "Opposite trend volumed candel";
+    } else if (trend === "DOWN" && lastCandelIsGreen) {
+      valid = false;
+      invalidReason = "Opposite trend volumed candel";
+    }
+  }
+
+
+
   // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
@@ -538,22 +565,8 @@ const getPriceAction = async (data, secondTry = false) => {
   }
   // Trend line validation End
 
-  // validate if previous candel of volumed candel is valid or invalid
-
-  // Calculate LastCandelIsGreen or red
-  let lastCandelIsGreen = getCandelIsGreen(latestCandel);
-
   if (valid) {
-    if (trend === "UP" && !lastCandelIsGreen) {
-      valid = false;
-      invalidReason = "Opposite trend volumed candel";
-    } else if (trend === "DOWN" && lastCandelIsGreen) {
-      valid = false;
-      invalidReason = "Opposite trend volumed candel";
-    }
-  }
-
-  if (valid) {
+    
     const previosCandel = data[latestCandelIndex - 1];
     if (trend === "UP") {
       if (previosCandel[2] > latestCandel[4]) {
@@ -569,6 +582,9 @@ const getPriceAction = async (data, secondTry = false) => {
     }
   }
   //end
+
+
+
 
   return {
     highestHigh,

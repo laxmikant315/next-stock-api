@@ -241,7 +241,7 @@ class BullController implements IControllerBase {
 
 
     this.router.get("/intradayTest", async (req, res) => {
-      const stocks = await getDetails("NIACL","intraday");
+      const stocks = await getDetails("TATAMOTORS","intraday");
 
       res.send(stocks);
     });
