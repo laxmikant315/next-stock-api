@@ -7,6 +7,7 @@ import {
   getIntradayStocks,
   deleteIntradayStocks,
   insertNotification,
+  getDetails,
 } from "../../controllers/home/swing/swing.service";
 import moment = require("moment");
 
@@ -233,6 +234,14 @@ class BullController implements IControllerBase {
 
     this.router.get("/intradayStocks", async (req, res) => {
       const stocks = await this.getStocks("intraday");
+
+      res.send(stocks);
+    });
+
+
+
+    this.router.get("/intradayTest", async (req, res) => {
+      const stocks = await getDetails("NIACL","intraday");
 
       res.send(stocks);
     });
