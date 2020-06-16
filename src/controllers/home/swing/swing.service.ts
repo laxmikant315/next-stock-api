@@ -960,7 +960,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
-              if (data.valid && data.goodOne) {
+              if (data.valid) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {
                     console.log("Stock added in bag " + x);
