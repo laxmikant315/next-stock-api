@@ -805,12 +805,34 @@ export const getDetails = async (symbol: string, type: string) => {
   ) {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
-
+  let tradeInfo;
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
     candelHeightIsValid
   ) {
+
+    if(type==="intraday"){
+      const formula = (price:number)=> Math.round((price/3000)*10)/10;
+
+      let orderPrice,sl1,target ;
+      if(priceAction.trend==="UP"){
+        const price =  priceAction.latestCandel[2];
+         orderPrice = price + formula(price);
+         sl1 = priceAction.low.lowest - formula(priceAction.low.lowest) ;
+         target = orderPrice + (Math.abs(orderPrice -  sl1))
+      }else if(priceAction.trend==="DOWN"){{
+        const price =  priceAction.latestCandel[3];
+         orderPrice = price - formula(price);
+         sl1 = priceAction.high.highest + formula(priceAction.high.highest) ;
+         target = orderPrice - (Math.abs(orderPrice -  sl1))
+      }
+
+      tradeInfo = {orderPrice,sl1,target}
+    }
+    
+    }
+
     const dayData = await getDayData(instrument, intervalParent);
 
     const { goodOne, avg, lastCandelHeight, allowedRange } = dayData;
@@ -846,6 +868,7 @@ export const getDetails = async (symbol: string, type: string) => {
       currentPrice,
       trendLine,
       secondTry,
+      tradeInfo
     };
     return data;
   }

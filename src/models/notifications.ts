@@ -34,7 +34,8 @@ const notificationSchema = new mongoose.Schema({
     },
     lastCandelIsGreen: Boolean,
     invalidReason:String,
-    secondTry:{bit:Boolean,priceActionLength:Number,priceActionSecondLength:Number}
+    secondTry:{bit:Boolean,priceActionLength:Number,priceActionSecondLength:Number},
+    tradeInfo:{orderPrice:Number,sl1:Number,target:Number}
 })
 
 export default mongoose.model('Notification',notificationSchema)
