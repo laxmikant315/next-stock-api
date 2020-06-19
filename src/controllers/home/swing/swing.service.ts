@@ -175,7 +175,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-  //  return mockData.data.candles;
+    return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
@@ -790,7 +790,6 @@ export const getDetails = async (symbol: string, type: string) => {
     return null;
   }
   if (type === "intraday") {
-    console.log("Price Action", priceAction);
     try {
       insertNotification({ ...priceAction, type: "priceaction", symbol });
     } catch (error) {}
@@ -806,32 +805,42 @@ export const getDetails = async (symbol: string, type: string) => {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
   let tradeInfo;
+
   if (
     priceAction.currentPrice > 100 &&
     priceAction.valid &&
     candelHeightIsValid
   ) {
 
+
     if(type==="intraday"){
       const formula = (price:number)=> Math.round((price/3000)*10)/10;
+      const properGap = (price:number)=> price / 100;
 
       let orderPrice,sl1,target ;
       if(priceAction.trend==="UP"){
+
         const price =  priceAction.latestCandel[2];
          orderPrice = price + formula(price);
-         sl1 = priceAction.low.lowest - formula(priceAction.low.lowest) ;
-         target = orderPrice + (Math.abs(orderPrice -  sl1))
-      }else if(priceAction.trend==="DOWN"){{
+         sl1 = orderPrice - properGap(orderPrice)
+         target = orderPrice + properGap(orderPrice)
+        
+
+     
+      }else if(priceAction.trend==="DOWN"){
         const price =  priceAction.latestCandel[3];
          orderPrice = price - formula(price);
-         sl1 = priceAction.high.highest + formula(priceAction.high.highest) ;
-         target = orderPrice - (Math.abs(orderPrice -  sl1))
+
+         sl1 = orderPrice + properGap(orderPrice)
+         target = orderPrice - properGap(orderPrice)
+        
       }
 
       tradeInfo = {orderPrice,sl1,target}
-    }
     
     }
+    
+    
 
     const dayData = await getDayData(instrument, intervalParent);
 
@@ -870,6 +879,9 @@ export const getDetails = async (symbol: string, type: string) => {
       secondTry,
       tradeInfo
     };
+
+
+    console.log("Price Action", data);
     return data;
   }
   return null;
