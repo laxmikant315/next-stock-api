@@ -19,44 +19,81 @@ import axios from 'axios';
 
 const webpush = require("web-push");
 
+
+
 const testData = {
-  createDt: {
-    $date: "2020-05-10T10:18:34.000Z",
+  "highestHigh": {
+    "highest": 1443.9,
+    "indexNo": 34
   },
-  instrument: "79873",
-  goodOne: true,
-  avgHeight: 13.495945945945943,
-  lastHeight: 10.899999999999977,
-  trend: "DOWN",
-  valid: true,
-  symbol: "HDFC",
-  avgCandelSize: 29.31,
-  todayCandelSize: 1.9,
-  allowedCandelSize: 20.52,
-  highestHigh: {
-    highest: 494.9,
-    indexNo: 0,
+  "lowestLow": {
+    "lowest": 940.8,
+    "indexNo": 15
   },
-  lowestLow: {
-    lowest: 254,
-    indexNo: 15,
+  "high": {
+    "highest": 1105,
+    "indexNo": 22
   },
-  high: {
-    highest: 331.95,
-    indexNo: 11,
+  "low": {
+    "lowest": 990,
+    "indexNo": 24
   },
-  low: {
-    lowest: 284.85,
-    indexNo: 8,
+  "secondTry": {
+    "bit": false,
+    "priceActionLength": 19,
+    "priceActionSecondLength": 0
   },
-  lastCandelIsGreen: false,
-  currentPrice: 366.1,
-  type: "intraday",
+  "trendLine": [
+    940.8,
+    985.325,
+    985.6875,
+    1005.9875,
+    1026.225,
+    1027.3375,
+    1048.1125,
+    1105,
+    1064.0749999999998,
+    990,
+    1004.3,
+    1014.9749999999999,
+    1053.325,
+    1088.9,
+    1091.45,
+    1114.9375,
+    1181.8,
+    1257.775,
+    1374.325,
+    1443.9,
+    1340,
+    1287,
+    1325,
+    1315,
+    1300,
+    1285,
+    1380
+  ],
+  "_id": "5eec8ce5cf811e0017933b5a",
+  "createDt": "2020-06-19T10:01:09.000Z",
+  "instrument": "1378561",
+  "goodOne": false,
+  "avgHeight": 36.78809523809524,
+  "lastHeight": 90.59999999999991,
+  "trend": "UP",
+  "valid": true,
+  "symbol": "AAVAS",
+  "avgCandelSize": 131.1,
+  "todayCandelSize": 325.8,
+  "allowedCandelSize": 91.77,
+  "lastCandelIsGreen": true,
+  "currentPrice": 1367.8,
+  "type": "intraday",
+  "__v": 0,
   tradeInfo:{
-    orderPrice:254.10,sl1:258,target:250
+    orderPrice:1445,sl1:1400,target:1500
   },
-  __v: 0,
+
 };
+
 
 class BullController implements IControllerBase {
   public router = express.Router();
