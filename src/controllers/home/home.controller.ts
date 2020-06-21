@@ -4,6 +4,7 @@ import IControllerBase from "interfaces/IControllerBase.interface";
 import axios from "axios";
 import Notification from "../../models/notifications";
 
+import { env } from "process";
 import {
   getInsruments,
   getVolumeStocks,
@@ -42,6 +43,9 @@ class HomeController implements IControllerBase {
   public initRoutes() {
     this.router.get("/", this.index);
     this.router.get("/notifications", this.notifications);
+    this.router.get("/appConfig", this.appConfig);
+    
+
     this.router.get(
       "/api/swing/:trend",
       async (req: Request, res: Response) => {
@@ -54,6 +58,15 @@ class HomeController implements IControllerBase {
         res.send(await getSwingStocks(trend));
       }
     );
+  }
+  appConfig(req: Request, res: Response) {
+    
+     const  {intradayRiskAmount} = env;
+      const config = {
+        intradayRiskAmount:+intradayRiskAmount
+      }
+      res.send(config)
+
   }
 
   notifications = async (req: Request, res: Response) => {
