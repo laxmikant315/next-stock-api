@@ -52,6 +52,9 @@ const testData = {
   lastCandelIsGreen: false,
   currentPrice: 366.1,
   type: "intraday",
+  tradeInfo:{
+    orderPrice:254.10,sl1:258,target:250
+  },
   __v: 0,
 };
 
