@@ -80,7 +80,7 @@ const testData = {
   "lastHeight": 90.59999999999991,
   "trend": "UP",
   "valid": true,
-  "symbol": "AAVAS",
+  "symbol": "HDFCBANK",
   "avgCandelSize": 131.1,
   "todayCandelSize": 325.8,
   "allowedCandelSize": 91.77,

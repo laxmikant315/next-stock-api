@@ -175,7 +175,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-    return mockData.data.candles;
+  // return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
