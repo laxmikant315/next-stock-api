@@ -175,7 +175,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-  // return mockData.data.candles;
+   //return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
@@ -815,7 +815,7 @@ export const getDetails = async (symbol: string, type: string) => {
 
     if(type==="intraday"){
       const formula = (price:number)=> Math.round((price/3000)*10)/10;
-      const properGap = (price:number)=> price / 100;
+      const properGap = (price:number)=> price / 125;
 
       let orderPrice,sl1,target ;
       if(priceAction.trend==="UP"){
@@ -835,6 +835,9 @@ export const getDetails = async (symbol: string, type: string) => {
          target = orderPrice - properGap(orderPrice)
         
       }
+      orderPrice = Math.round(orderPrice*20)/20
+      sl1 = Math.round(sl1*20)/20
+      target = Math.round(target*20)/20
 
       tradeInfo = {orderPrice,sl1,target}
     
@@ -995,7 +998,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
               (!data.lastCandelIsGreen && data.trend.toUpperCase() === "DOWN")
             ) {
-              if (data.valid) {
+              if (data.valid && data.todayCandelSize <= data.avgCandelSize) {
                 if (trend) {
                   if (data.trend.toUpperCase() === trend.toUpperCase()) {
                     console.log("Stock added in bag " + x);
