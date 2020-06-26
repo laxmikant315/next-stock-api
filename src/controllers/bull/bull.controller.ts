@@ -216,7 +216,7 @@ class BullController implements IControllerBase {
 
       return data;
     } catch (error) {
-      console.log(error.response.data.message);
+      console.log(error);
     }
   }
   async create() {
