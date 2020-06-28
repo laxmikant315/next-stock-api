@@ -20,6 +20,9 @@ export const placeOrder = async (
   order_type: string,
   myOrderType: string
 ) => {
+
+  console.log('tradingsymbol1',tradingsymbol)
+
   const requestBody = {
     exchange: "NSE",
     tradingsymbol,
@@ -65,7 +68,9 @@ export const placeOrder = async (
       .then((x) => x.data.data)
       .catch((e) => console.log(e.response.data.message));
   }
+  console.log('tradingsymbol2',tradingsymbol)
   if (res.status === "success") {
+
     const result = {
       symbol: tradingsymbol,
       orderNo: res.data.order_id,
