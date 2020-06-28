@@ -45,6 +45,8 @@ class KiteController implements IControllerBase {
   };
 
   order = async (req: Request, res: Response) => {
+
+    console.log('Req Body',req.body);
     const { symbol, transaction_type, quantity, price, sl, target } = req.body;
 
     const response = await placeOrder(
