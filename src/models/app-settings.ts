@@ -6,7 +6,8 @@ const appSettingsSchema = new mongoose.Schema({
     swing:{
         amount :Number,
         noOfslots : Number
-    }
+    },
+    mock:Object
     
 })
 
