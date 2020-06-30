@@ -10,7 +10,7 @@ import Order from "../../models/order";
 import moment = require("moment");
 import e = require("express");
 
-const mockEnabled = process.env.MOCK_ENABLED || false;
+const mockEnabled = process.env.MOCK_ENABLED == "true" || false;
 
 export const placeOrder = async (
   tradingsymbol: string,
