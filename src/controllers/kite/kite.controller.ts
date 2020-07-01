@@ -148,7 +148,7 @@ class KiteController implements IControllerBase {
 
                 
                   await cancelOrder(targetOrderNo).then(async (x) => {
-                    console.log("Target Order Cancelled", x);
+                    console.log("Target Order Cancelled Response", x);
 
                     const orderInMyBag = await Order.findOne({
                       symbol,
@@ -214,7 +214,7 @@ class KiteController implements IControllerBase {
                   slQueue.close();
 
                   await cancelOrder(slOrderNo).then(async (x) => {
-                    console.log("SL Order Cancelled", x);
+                    console.log("SL Order Cancelled Response", x);
                     const orderInMyBag = await Order.findOne({
                       symbol,
                       orderNo: slOrderNo,
@@ -238,6 +238,7 @@ class KiteController implements IControllerBase {
 
       res.send(response);
     } else {
+      console.log("Failed to get response while placing order")
       res.send("ERROR");
     }
   };

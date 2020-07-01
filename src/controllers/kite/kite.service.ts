@@ -21,7 +21,6 @@ export const placeOrder = async (
   myOrderType: string
 ) => {
 
-  console.log('tradingsymbol1',tradingsymbol)
 
   const requestBody = {
     exchange: "NSE",
@@ -59,6 +58,7 @@ export const placeOrder = async (
       res = db[0].mock.orderTarget;
     }
   } else {
+    console.log('API REQUEST=>',requestBody)  
     res = await axios
       .post(
         `${env.zerodhaUrl}oms/orders/regular`,
@@ -67,8 +67,9 @@ export const placeOrder = async (
       )
       .then((x) => x.data.data)
       .catch((e) => console.log(e.response.data.message));
+
+    console.log('API RESPONSE=>',res)  
   }
-  console.log('tradingsymbol2',tradingsymbol)
   if (res.status === "success") {
 
     const result = {
@@ -125,7 +126,7 @@ export const addToCronToWatch = async (
   order_id
 ) => {
   const ordersRes = await checkOrder();
-
+  console.log('API RESPONSE FOR CHECK ORDER=>',ordersRes)
   if (
     ordersRes.status === "success" &&
     ordersRes.data &&
@@ -143,7 +144,7 @@ export const addToCronToWatch = async (
       orderNo: order.order_id,
     }).exec();
 
-    console.log(orderInMyBag);
+    console.log('orderInMyBag',orderInMyBag);
     if (
       order.status === "COMPLETE" &&
       orderInMyBag.get("status") === "PLACED"
