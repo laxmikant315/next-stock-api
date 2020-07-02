@@ -9,7 +9,7 @@ import {
   watchOnOrder,
   cancelOrder,
 } from "./kite.service";
-import { pushOnApp } from "controllers/bull/bull.controller";
+import { pushOnApp } from "../../controllers/bull/bull.controller";
 
 class KiteController implements IControllerBase {
   public path = "/kite";
