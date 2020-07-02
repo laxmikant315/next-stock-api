@@ -101,7 +101,7 @@ class BullController implements IControllerBase {
   intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
   
 
-  dailyQueue = new Bull("daily-queue", this.REDIS_URL);
+  // dailyQueue = new Bull("daily-queue", this.REDIS_URL);
 
   dailyEveningQueue = new Bull("daily-eveing-queue", this.REDIS_URL);
 
@@ -130,9 +130,9 @@ class BullController implements IControllerBase {
       // this.getStocks("intraday");
       //  this.insertNotification({symbol:"LAKSH",trend:"UP",goodOne:true,valid:true,avgCandelSize:12,allowedCandelSize:10,todayCandelSize:3,highestHigh:{index:50,highest:210}, lowestLow:{index:10,lowest:100}, high:{index:20,highest:170}, low:{index:35,lowest:150}});
 
-      this.dailyQueue.process(() => {
-        getIntradayStocks();
-      });
+      // this.dailyQueue.process(() => {
+      //   getIntradayStocks();
+      // });
 
       this.dailyEveningQueue.process(async () => {
         console.log("process dailyEveningQueue started");
@@ -230,12 +230,12 @@ class BullController implements IControllerBase {
       }
     );
 
-    await this.dailyQueue.add(
-      {},
-      {
-        repeat: { cron: process.env.CRON_DAILY },
-      }
-    );
+    // await this.dailyQueue.add(
+    //   {},
+    //   {
+    //     repeat: { cron: process.env.CRON_DAILY },
+    //   }
+    // );
     await this.dailyEveningQueue.add(
       {},
       {
