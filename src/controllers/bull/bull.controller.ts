@@ -3,7 +3,6 @@ import Bull = require("bull");
 import * as express from "express";
 import {
   getSwingStocks,
-
   getIntradayStocks,
   deleteIntradayStocks,
   insertNotification,
@@ -14,36 +13,33 @@ import moment = require("moment");
 import Subscription from "../../models/subscription";
 import { sockets } from "../../app";
 import ExpoPushToken from "../../models/ExpoPushToken";
-import axios from 'axios';
-
+import axios from "axios";
 
 const webpush = require("web-push");
 
-
-
 const testData = {
-  "highestHigh": {
-    "highest": 1443.9,
-    "indexNo": 34
+  highestHigh: {
+    highest: 1443.9,
+    indexNo: 34,
   },
-  "lowestLow": {
-    "lowest": 940.8,
-    "indexNo": 15
+  lowestLow: {
+    lowest: 940.8,
+    indexNo: 15,
   },
-  "high": {
-    "highest": 1105,
-    "indexNo": 22
+  high: {
+    highest: 1105,
+    indexNo: 22,
   },
-  "low": {
-    "lowest": 990,
-    "indexNo": 24
+  low: {
+    lowest: 990,
+    indexNo: 24,
   },
-  "secondTry": {
-    "bit": false,
-    "priceActionLength": 19,
-    "priceActionSecondLength": 0
+  secondTry: {
+    bit: false,
+    priceActionLength: 19,
+    priceActionSecondLength: 0,
   },
-  "trendLine": [
+  trendLine: [
     940.8,
     985.325,
     985.6875,
@@ -70,30 +66,30 @@ const testData = {
     1315,
     1300,
     1285,
-    1380
+    1380,
   ],
-  "_id": "5eec8ce5cf811e0017933b5a",
-  "createDt": "2020-06-19T10:01:09.000Z",
-  "instrument": "1378561",
-  "goodOne": false,
-  "avgHeight": 36.78809523809524,
-  "lastHeight": 90.59999999999991,
-  "trend": "UP",
-  "valid": true,
-  "symbol": "HDFCBANK",
-  "avgCandelSize": 131.1,
-  "todayCandelSize": 325.8,
-  "allowedCandelSize": 91.77,
-  "lastCandelIsGreen": true,
-  "currentPrice": 1367.8,
-  "type": "intraday",
-  "__v": 0,
-  tradeInfo:{
-    orderPrice:1445,sl1:1400,target:1500
+  _id: "5eec8ce5cf811e0017933b5a",
+  createDt: "2020-06-19T10:01:09.000Z",
+  instrument: "1378561",
+  goodOne: false,
+  avgHeight: 36.78809523809524,
+  lastHeight: 90.59999999999991,
+  trend: "UP",
+  valid: true,
+  symbol: "HDFCBANK",
+  avgCandelSize: 131.1,
+  todayCandelSize: 325.8,
+  allowedCandelSize: 91.77,
+  lastCandelIsGreen: true,
+  currentPrice: 1367.8,
+  type: "intraday",
+  __v: 0,
+  tradeInfo: {
+    orderPrice: 1445,
+    sl1: 1400,
+    target: 1500,
   },
-
 };
-
 
 class BullController implements IControllerBase {
   public router = express.Router();
@@ -169,8 +165,6 @@ class BullController implements IControllerBase {
     }
   }
 
-
-
   async getStocks(type: string) {
     try {
       const data = await getSwingStocks(type);
@@ -193,7 +187,11 @@ class BullController implements IControllerBase {
               socket.emit("FromAPI", d);
             }
 
-            pushOnApp(d)
+            pushOnApp({
+              title: `${d.symbol} STOCK UPDATE`,
+              body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
+              data: d,
+            });
 
             const payload = JSON.stringify({
               title: "Stock Update",
@@ -271,18 +269,14 @@ class BullController implements IControllerBase {
       res.send(response);
     });
 
-
     this.router.get("/intradayStocks", async (req, res) => {
       const stocks = await this.getStocks("intraday");
 
       res.send(stocks);
     });
 
-
-
     this.router.get("/intradayTest", async (req, res) => {
-    
-      const stocks = await getDetails("SBILIFE","intraday");
+      const stocks = await getDetails("SBILIFE", "intraday");
 
       res.send(stocks);
     });
@@ -295,7 +289,6 @@ class BullController implements IControllerBase {
         url: "https://youtube.com",
       });
 
-      
       for (let socket of sockets) {
         socket.emit("FromAPI", testData);
       }
@@ -345,83 +338,76 @@ class BullController implements IControllerBase {
     });
 
     this.router.post("/registerPush", async (req, res) => {
-
-      const {expoPushToken:token} = req.body;
+      const { expoPushToken: token } = req.body;
       const exists = await ExpoPushToken.findOne({
-        token
+        token,
       }).exec();
 
       if (!exists) {
-        const sub = new ExpoPushToken({token});
+        const sub = new ExpoPushToken({ token });
         sub.save().then((x) => console.log("New Expo Token added."));
       }
 
       res.status(201).json({});
-
     });
 
-
     this.router.get("/pushOnApp", async (req, res) => {
-
-      
-      await pushOnApp(testData);
-        res.status(201).json({});
-        // const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        //   method: 'POST',
-        //   headers: {
-        //     Accept: 'application/json',
-        //     'Accept-encoding': 'gzip, deflate',
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify(message),
-        // });
-
+      await pushOnApp({
+        title: `${testData.symbol} STOCK UPDATE`,
+        body: `${
+          testData.symbol
+        } created ${testData.trend.toLowerCase()} trend`,
+        data: testData,
       });
-    
-    }
+      res.status(201).json({});
+      // const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      //   method: 'POST',
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Accept-encoding': 'gzip, deflate',
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(message),
+      // });
+    });
   }
-
+}
 
 export default BullController;
 
-
-const  pushOnApp=async(data?:any)=>{
-  const tokens :any= await ExpoPushToken.find();
-    for (let sub of tokens) {
-
-
-      
-      let message = {
+export const pushOnApp = async ({ title, body, data }: any) => {
+  const tokens: any = await ExpoPushToken.find();
+  for (let sub of tokens) {
+    let message = {
+      to: sub.token,
+      sound: "default",
+      title: "Original Title",
+      body: "And here is the body!",
+      data: { data: "Laxmikant" },
+      _displayInForeground: true,
+    };
+    if (data) {
+      message = {
         to: sub.token,
-        sound: 'default',
-        title: 'Original Title',
-        body:  'And here is the body!',
-        data:{data:'Laxmikant'},
+        sound: "default",
+        title,
+        body,
+        data: { data },
         _displayInForeground: true,
       };
-      if(data){
-         message = {
-          to: sub.token,
-          sound: 'default',
-          title:`${data.symbol} STOCK UPDATE`,
-          body:  `${data.symbol} created ${data.trend.toLowerCase()} trend`,
-          data:{data},
-          _displayInForeground: true,
-        };  
-      }
+    }
 
-
-      console.log(message);
-       await axios.post('https://exp.host/--/api/v2/push/send',
-      JSON.stringify(message),{
-        headers:{
-          Accept: 'application/json',
-          'Accept-encoding': 'gzip, deflate',
-          'Content-Type': 'application/json',
-        }
-      }
-      ).catch(x=>{
-        console.log('Could not send the notification',x)
+    console.log(message);
+    await axios
+      .post("https://exp.host/--/api/v2/push/send", JSON.stringify(message), {
+        headers: {
+          Accept: "application/json",
+          "Accept-encoding": "gzip, deflate",
+          "Content-Type": "application/json",
+        },
       })
-}
-}
+      .catch((x) => {
+        console.log("Could not send the notification", x);
+      });
+  }
+};

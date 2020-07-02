@@ -146,14 +146,15 @@ export const addToCronToWatch = async (
 
     console.log('orderInMyBag',orderInMyBag);
     if (
-      order.status === "COMPLETE" &&
+      order.status === "COMPLETE" || order.status==="CANCELLED" &&
       orderInMyBag.get("status") === "PLACED"
     ) {
-      await orderInMyBag.update({ status: "COMPLETE" }, () => {
+      await orderInMyBag.update({ status:  order.status  }, () => {
         console.log("Order updated");
       });
       return "CLOSE";
     }
+    
   }
 };
 

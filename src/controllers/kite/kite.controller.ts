@@ -9,6 +9,7 @@ import {
   watchOnOrder,
   cancelOrder,
 } from "./kite.service";
+import { pushOnApp } from "controllers/bull/bull.controller";
 
 class KiteController implements IControllerBase {
   public path = "/kite";
@@ -45,10 +46,9 @@ class KiteController implements IControllerBase {
   };
 
   order = async (req: Request, res: Response) => {
-
-    console.log('Req Body',req.body);
+    console.log("Req Body", req.body);
     const { symbol, transaction_type, quantity, price, sl, target } = req.body;
-    console.log('symbol',symbol)
+    console.log("symbol", symbol);
     const response = await placeOrder(
       symbol,
       transaction_type,
@@ -121,7 +121,7 @@ class KiteController implements IControllerBase {
                 target,
               },
               async (job, queue) => {
-                slQueue= queue;
+                slQueue = queue;
                 console.log("Trade SL watch started", job.data);
                 const {
                   symbol,
@@ -146,10 +146,12 @@ class KiteController implements IControllerBase {
                   queue.close();
                   targetQueue.close();
 
-                
                   await cancelOrder(targetOrderNo).then(async (x) => {
                     console.log("Target Order Cancelled Response", x);
-
+                    pushOnApp({
+                      title: `Stoploss hitted.`,
+                      body: `${symbol} ${oppTransaction} Stoploss hitted & Target Order Cancellled`,
+                    });
                     const orderInMyBag = await Order.findOne({
                       symbol,
                       orderNo: targetOrderNo,
@@ -158,7 +160,6 @@ class KiteController implements IControllerBase {
                     await orderInMyBag.update({ status: "CANCELLED" }, () => {
                       console.log("Target Order document updated");
                     });
-
                   });
                 }
                 return res;
@@ -189,7 +190,7 @@ class KiteController implements IControllerBase {
               },
               async (job, queue) => {
                 targetQueue = queue;
-                targetOrderNo
+                targetOrderNo;
                 console.log("Trade Target watch started", job.data);
                 const {
                   symbol,
@@ -215,6 +216,11 @@ class KiteController implements IControllerBase {
 
                   await cancelOrder(slOrderNo).then(async (x) => {
                     console.log("SL Order Cancelled Response", x);
+                    pushOnApp({
+                      title: `Target hitted.`,
+                      body: `${symbol} ${oppTransaction} Target hitted & Stop-loss Order Cancellled`,
+                    });
+
                     const orderInMyBag = await Order.findOne({
                       symbol,
                       orderNo: slOrderNo,
@@ -229,7 +235,10 @@ class KiteController implements IControllerBase {
             );
 
             console.log("target added.", response);
-
+            pushOnApp({
+              title: `${symbol} ${transaction_type} Order Executed`,
+              body: `Stoploss(${sl}) & Target${target} are placed.`,
+            });
             timeQueue.close();
           }
           return res;
@@ -238,7 +247,7 @@ class KiteController implements IControllerBase {
 
       res.send(response);
     } else {
-      console.log("Failed to get response while placing order")
+      console.log("Failed to get response while placing order");
       res.send("ERROR");
     }
   };
