@@ -187,7 +187,7 @@ class BullController implements IControllerBase {
               socket.emit("FromAPI", d);
             }
 
-            pushOnApp({
+            await pushOnApp({
               title: `${d.symbol} STOCK UPDATE`,
               body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
               data: d,

@@ -90,8 +90,10 @@ class KiteController implements IControllerBase {
             orderNo
           );
           if (res === "CLOSE") {
+           
             console.log("Trade watch closed", job.data);
-
+            timeQueue.close();
+            
             let oppTransaction = "BUY";
             if (transaction_type === "BUY") {
               oppTransaction = "SELL";
@@ -148,7 +150,7 @@ class KiteController implements IControllerBase {
 
                   await cancelOrder(targetOrderNo).then(async (x) => {
                     console.log("Target Order Cancelled Response", x);
-                    pushOnApp({
+                   await pushOnApp({
                       title: `Stoploss hitted.`,
                       body: `${symbol} ${oppTransaction} Stoploss hitted & Target Order Cancellled`,
                     });
@@ -216,7 +218,7 @@ class KiteController implements IControllerBase {
 
                   await cancelOrder(slOrderNo).then(async (x) => {
                     console.log("SL Order Cancelled Response", x);
-                    pushOnApp({
+                    await pushOnApp({
                       title: `Target hitted.`,
                       body: `${symbol} ${oppTransaction} Target hitted & Stop-loss Order Cancellled`,
                     });
@@ -235,11 +237,11 @@ class KiteController implements IControllerBase {
             );
 
             console.log("target added.", response);
-            pushOnApp({
+            await  pushOnApp({
               title: `${symbol} ${transaction_type} Order Executed`,
               body: `Stoploss(${sl}) & Target${target} are placed.`,
             });
-            timeQueue.close();
+         
           }
           return res;
         }
