@@ -65,7 +65,7 @@ export const placeOrder = async (
         qs.stringify(requestBody),
         config
       )
-      .then((x) => x.data.data)
+      .then((x) => x.data)
       .catch((e) => console.log(e.response.data.message));
 
     console.log('API RESPONSE=>',res)  
@@ -173,7 +173,7 @@ export const checkOrder = async () => {
 
   return axios
     .get(`${env.zerodhaUrl}oms/orders`, config)
-    .then((x) => x.data.data)
+    .then((x) => x.data)
     .catch((e) => console.log(e.response.data.message));
 };
 
@@ -193,6 +193,6 @@ export const cancelOrder = async (order_id) => {
 
   return axios
     .delete(`${env.zerodhaUrl}oms/orders/regular/${order_id}`, config)
-    .then((x) => x.data.data)
+    .then((x) => x.data)
     .catch((e) => console.log(e.response.data.message));
 };
