@@ -356,8 +356,8 @@ class BullController implements IControllerBase {
         title: `${testData.symbol} STOCK UPDATE`,
         body: `${
           testData.symbol
-        } created ${testData.trend.toLowerCase()} trend`,
-        data: testData,
+        } created ${testData.trend.toLowerCase()} trend`
+     
       });
       res.status(201).json({});
       // const response = await fetch('https://exp.host/--/api/v2/push/send', {
@@ -386,7 +386,7 @@ export const pushOnApp = async ({ title, body, data }: any) => {
       data: { data: "Laxmikant" },
       _displayInForeground: true,
     };
-    if (data) {
+ 
       message = {
         to: sub.token,
         sound: "default",
@@ -395,7 +395,7 @@ export const pushOnApp = async ({ title, body, data }: any) => {
         data: { data },
         _displayInForeground: true,
       };
-    }
+    
 
     console.log(message);
     await axios
