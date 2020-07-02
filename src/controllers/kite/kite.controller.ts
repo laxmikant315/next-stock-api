@@ -112,7 +112,7 @@ class KiteController implements IControllerBase {
             let slQueue, targetQueue;
             let slOrderNo = response.orderNo;
 
-            await watchOnOrder(
+             watchOnOrder(
               "order-sl-queue",
               {
                 symbol,
@@ -166,7 +166,9 @@ class KiteController implements IControllerBase {
                 }
                 return res;
               }
-            );
+            ).then(x=>{
+              console.log('watcher added for stoploss')
+            });
 
             console.log("Stoploss added.", response);
 
@@ -180,7 +182,7 @@ class KiteController implements IControllerBase {
               "target"
             );
             const targetOrderNo = response1.orderNo;
-            await watchOnOrder(
+             watchOnOrder(
               "order-target-queue",
               {
                 symbol,
@@ -234,7 +236,9 @@ class KiteController implements IControllerBase {
                 }
                 return res;
               }
-            );
+            ).then(x=>{
+              console.log('watcher added for target')
+            });
 
             console.log("target added.", response);
             await  pushOnApp({

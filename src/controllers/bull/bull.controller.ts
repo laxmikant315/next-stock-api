@@ -99,7 +99,7 @@ class BullController implements IControllerBase {
 
   swingQueue = new Bull("swing-queue", this.REDIS_URL);
   intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
-  timeQueue = new Bull("time-queue", this.REDIS_URL);
+  
 
   dailyQueue = new Bull("daily-queue", this.REDIS_URL);
 
@@ -139,9 +139,7 @@ class BullController implements IControllerBase {
         await deleteIntradayStocks();
       });
 
-      this.timeQueue.process((job) => {
-        console.log(moment().format());
-      });
+     
 
       this.swingQueue.process(async (job) => {
         console.log("process started", job.data);
@@ -224,15 +222,7 @@ class BullController implements IControllerBase {
         repeat: { cron: this.cronSwing },
       }
     );
-    await this.timeQueue.add(
-      {
-        data: "Time Print",
-      },
-      {
-        repeat: { every: 60000 },
-      }
-    );
-
+    
     await this.intradayQueue.add(
       {},
       {
