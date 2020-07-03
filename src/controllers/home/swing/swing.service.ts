@@ -175,7 +175,7 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-   //return mockData.data.candles;
+  //return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
 
@@ -544,11 +544,15 @@ const getPriceAction = async (data, secondTry = false) => {
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
-
+        // console.log(`lowPlus30 = low.lowest${low.lowest} + ((highestHigh.highest${highestHigh.highest}-low.lowest${low.lowest})*0.3)`)
+        
         const lowPlus30 = low.lowest + ((highestHigh.highest-low.lowest)*0.3)
+        // console.log(`lowPlus30=${lowPlus30}`)
+       
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
 
           if (data[i] && data[i][3] < lowPlus30) {
+            console.log(data[i])
             valid = false;
           }
         }
@@ -788,9 +792,9 @@ export const getDetails = async (symbol: string, type: string) => {
   }
 
   const data = await getHistorical(instrument, interval, from);
-
+  
   let priceAction = await getPriceAction(data);
-
+ 
   const priceActionLength = getPriceActionLength(priceAction);
 
   let secondTry = { bit: false, priceActionLength, priceActionSecondLength: 0 };
@@ -806,7 +810,7 @@ export const getDetails = async (symbol: string, type: string) => {
     const data2 = data.slice(startIndex, data.length);
 
     const priceActionSecond = await getPriceAction(data2, true);
-
+   
     if (priceActionSecond) {
       const priceActionSecondLength = getPriceActionLength(priceActionSecond);
 
