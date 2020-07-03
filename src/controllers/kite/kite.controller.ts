@@ -217,6 +217,7 @@ class KiteController implements IControllerBase {
                   console.log("Trade SL & Target watch closed", job.data);
                   queue.close();
                   slQueue.close();
+                  
 
                   await cancelOrder(slOrderNo).then(async (x) => {
                     console.log("SL Order Cancelled Response", x);

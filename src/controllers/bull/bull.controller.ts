@@ -114,6 +114,10 @@ class BullController implements IControllerBase {
       this.initRoutes();
       this.create();
 
+
+      // const result =this. validatePriceAction({ll:336.5,h:343.65,l:337.25,hh:351.45,trend:"DOWN"})
+
+
       // Replace with your email
       webpush.setVapidDetails(
         "mailto:laxmikantphadke@gmail.com",
@@ -150,7 +154,7 @@ class BullController implements IControllerBase {
         console.log("Intraday job started", job.data);
         return this.getStocks("intraday");
       });
-
+     
       this.swingQueue.on("completed", (job, result) => {
         console.log(
           `Cron Job completed with result on ${
@@ -162,6 +166,10 @@ class BullController implements IControllerBase {
       console.log(error);
     }
   }
+  // const result =this. validatePriceAction({ll:150.5,h:156.4,l:152.6,hh:156.45,trend:"UP"})
+
+   
+
 
   async getStocks(type: string) {
     try {

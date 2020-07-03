@@ -581,6 +581,14 @@ const getPriceAction = async (data, secondTry = false) => {
       invalidReason = "Previous candel of volumed candel is invalid.";
     }
   }
+
+
+  if(valid){
+    valid =  validatePriceAction({ll:lowestLow.lowest,h:high.highest,l:low.lowest,hh:highestHigh.highest,trend})
+    if (!valid) {
+      invalidReason = "Price action HH,LL,L,H gap invalid.";
+    }
+  }
   //end
 
 
@@ -607,6 +615,25 @@ const getPriceAction = async (data, secondTry = false) => {
   };
 };
 
+
+const validatePriceAction = ({h,l,hh,ll,trend}:{h:number,l:number,hh:number,ll:number,trend:string})=>{
+  const a = ((Math.abs(ll-h))*20/100);
+  const b = ((Math.abs(hh-l))*20/100);
+  
+  if(trend==="UP"){
+    // console.log(`${l}>(${a}+${ll})[${a+ll}] && ${h}<(${hh}-${b})[${b+hh}]`)
+    if(l>(a+ll) && h<(hh-b)){
+      return true
+    }
+  }else if(trend==="DOWN"){
+    // console.log(`${h}<(${hh}-${b})[${hh-b}] && ${l}>(${ll}+${a})[${ll+a}]`)
+    if(h<(hh-b) && l>(ll+a)){
+      return true
+    }
+  }
+  return false
+ 
+}
 const getDayData = async (instrumentToken, interval = "day") => {
   let from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss");
 
