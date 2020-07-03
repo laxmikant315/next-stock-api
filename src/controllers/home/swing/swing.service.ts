@@ -544,16 +544,20 @@ const getPriceAction = async (data, secondTry = false) => {
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
+
+        const lowPlus30 = low.lowest + ((highestHigh.highest-low.lowest)*0.3)
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
-          if (data[i] && data[i][3] < data[low.indexNo][3]) {
+
+          if (data[i] && data[i][3] < lowPlus30) {
             valid = false;
           }
         }
       }
     } else if (trend === "DOWN") {
       if (lowestLow.indexNo < latestCandelIndex) {
+        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest)*0.3)
         for (let i = lowestLow.indexNo; i <= latestCandelIndex; i++) {
-          if (data[i] && data[i][2] > data[high.indexNo][2]) {
+          if (data[i] && data[i][2] > highMinus30) {
             valid = false;
           }
         }
