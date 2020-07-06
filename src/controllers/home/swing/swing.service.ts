@@ -546,7 +546,7 @@ const getPriceAction = async (data, secondTry = false) => {
       if (highestHigh.indexNo < latestCandelIndex) {
         // console.log(`lowPlus30 = low.lowest${low.lowest} + ((highestHigh.highest${highestHigh.highest}-low.lowest${low.lowest})*0.3)`)
         
-        const lowPlus30 = low.lowest + ((highestHigh.highest-low.lowest)*0.3)
+        const lowPlus30 = low.lowest + ((highestHigh.highest-low.lowest)*0.25)
         // console.log(`lowPlus30=${lowPlus30}`)
        
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
@@ -559,7 +559,7 @@ const getPriceAction = async (data, secondTry = false) => {
       }
     } else if (trend === "DOWN") {
       if (lowestLow.indexNo < latestCandelIndex) {
-        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest)*0.3)
+        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest)*0.25)
         for (let i = lowestLow.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][2] > highMinus30) {
             valid = false;
