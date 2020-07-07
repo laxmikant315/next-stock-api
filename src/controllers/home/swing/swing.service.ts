@@ -366,7 +366,7 @@ const getPriceAction = async (data, secondTry = false) => {
 
   let valid = true;
   let invalidReason = "";
-
+  let saveLog = false;
   // Trend Length Validation && Trend Line
   const trendLine = [];
 
@@ -569,6 +569,7 @@ const getPriceAction = async (data, secondTry = false) => {
     }
     if (!valid) {
       invalidReason = "Trend line validation failed";
+      saveLog=true;
     }
   }
   // Trend line validation End
@@ -587,6 +588,7 @@ const getPriceAction = async (data, secondTry = false) => {
     }
     if (!valid) {
       invalidReason = "Previous candel of volumed candel is invalid.";
+      saveLog=true;
     }
   }
 
@@ -595,6 +597,7 @@ const getPriceAction = async (data, secondTry = false) => {
     valid =  validatePriceAction({ll:lowestLow.lowest,h:high.highest,l:low.lowest,hh:highestHigh.highest,trend})
     if (!valid) {
       invalidReason = "Price action HH,LL,L,H gap invalid.";
+      saveLog=true;
     }
   }
   //end
@@ -620,6 +623,7 @@ const getPriceAction = async (data, secondTry = false) => {
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
     trendLine,
+    saveLog
   };
 };
 
