@@ -8,6 +8,7 @@ import {
   addToCronToWatch,
   watchOnOrder,
   cancelOrder,
+  getCurrentPrice,
 } from "./kite.service";
 import { pushOnApp } from "../../controllers/bull/bull.controller";
 
@@ -17,7 +18,7 @@ class KiteController implements IControllerBase {
 
   constructor() {
     this.initRoutes();
-
+    
     // this.orderWatch
     //   .add(
     //     {
@@ -48,13 +49,26 @@ class KiteController implements IControllerBase {
   order = async (req: Request, res: Response) => {
     console.log("Req Body", req.body);
     const { symbol, transaction_type, quantity, price, sl, target } = req.body;
-    console.log("symbol", symbol);
+    const currentPrice = await getCurrentPrice(symbol);
+
+
+    let order_type="SL-M";
+    if(transaction_type==="BUY"){
+      if(currentPrice>price){
+        order_type = "LIMIT"
+      }
+    }else if (transaction_type==="SELL"){
+      if(currentPrice<price){
+        order_type = "LIMIT"
+      }
+    }
+    
     const response = await placeOrder(
       symbol,
       transaction_type,
       quantity,
       price,
-      "SL-M",
+      order_type ,
       "order"
     );
 

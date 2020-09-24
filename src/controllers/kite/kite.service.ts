@@ -10,7 +10,7 @@ import Order from "../../models/order";
 import moment = require("moment");
 import e = require("express");
 
-const mockEnabled = process.env.MOCK_ENABLED == "true" || false;
+let mockEnabled = env.MOCK_ENABLED == "true" || false;
 
 export const placeOrder = async (
   tradingsymbol: string,
@@ -20,8 +20,6 @@ export const placeOrder = async (
   order_type: string,
   myOrderType: string
 ) => {
-
-
   const requestBody = {
     exchange: "NSE",
     tradingsymbol,
@@ -58,7 +56,7 @@ export const placeOrder = async (
       res = db[0].mock.orderTarget;
     }
   } else {
-    console.log('API REQUEST=>',requestBody)  
+    console.log("API REQUEST=>", requestBody);
     res = await axios
       .post(
         `${env.zerodhaUrl}oms/orders/regular`,
@@ -68,10 +66,9 @@ export const placeOrder = async (
       .then((x) => x.data)
       .catch((e) => console.log(e.response.data.message));
 
-    console.log('API RESPONSE=>',res)  
+    console.log("API RESPONSE=>", res);
   }
   if (res.status === "success") {
-
     const result = {
       symbol: tradingsymbol,
       orderNo: res.data.order_id,
@@ -126,7 +123,7 @@ export const addToCronToWatch = async (
   order_id
 ) => {
   const ordersRes = await checkOrder();
-  console.log('API RESPONSE FOR CHECK ORDER=>',ordersRes)
+  console.log("API RESPONSE FOR CHECK ORDER=>", ordersRes);
   if (
     ordersRes.status === "success" &&
     ordersRes.data &&
@@ -144,17 +141,18 @@ export const addToCronToWatch = async (
       orderNo: order.order_id,
     }).exec();
 
-    console.log('orderInMyBag',orderInMyBag);
+    console.log("orderInMyBag", orderInMyBag);
     if (
-      order.status === "COMPLETE" || order.status==="CANCELLED" &&
+      (order.status === "COMPLETE" ||
+        order.status === "CANCELLED" ||
+        order.status === "REJECTED") &&
       orderInMyBag.get("status") === "PLACED"
     ) {
-      await orderInMyBag.update({ status:  order.status  }, () => {
+      await orderInMyBag.update({ status: order.status }, () => {
         console.log("Order updated");
       });
       return "CLOSE";
     }
-    
   }
 };
 
@@ -166,17 +164,35 @@ export const checkOrder = async () => {
   };
 
   if (mockEnabled) {
-  const db: any = await AppSetting.find({}).exec();
+    const db: any = await AppSetting.find({}).exec();
 
-  return db[0].mock.orders;
+    return db[0].mock.orders;
   }
-
-
   return axios
     .get(`${env.zerodhaUrl}oms/orders`, config)
     .then((x) => x.data)
     .catch((e) => console.log(e.response.data.message));
 };
+export const getCurrentPrice = async (symbol) => {
+  const config = {
+    headers: {
+      authorization: env.accessToken,
+    },
+  };
+ 
+  if (env.MOCK_ENABLED==="true") {
+    const db: any = await AppSetting.find({}).exec();
+    console.log("")
+    const res= db[0].mock.ltp;
+    return res.data && res.data[`NSE:${symbol}`].last_price;
+  }
+
+  return axios
+    .get(`${env.zerodhaUrl}quote/ltp?i=NSE:${symbol}`, config)
+    .then((x) =>  x.data && x.data[`NSE:${symbol}`].last_price)
+    .catch((e) => console.log(e.response));
+};
+
 
 export const cancelOrder = async (order_id) => {
   const config = {
@@ -187,9 +203,9 @@ export const cancelOrder = async (order_id) => {
   console.log("Order Cancelling called", order_id);
 
   if (mockEnabled) {
-  const db: any = await AppSetting.find({}).exec();
+    const db: any = await AppSetting.find({}).exec();
 
-  return db[0].mock.orderSl;
+    return db[0].mock.orderSl;
   }
 
   return axios
