@@ -10,7 +10,7 @@ services:
     command: "npm run dev"
     working_dir: /usr/src/next-stock-api
     environment: 
-      POSTGRES_URI: postgres://laksh:secret@postgres:5432/stock-app
+      DATABASE_URL: postgres://laksh:secret@postgres:5432/stock-app
     links:
       - postgres
     ports:

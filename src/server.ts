@@ -15,7 +15,7 @@ require('dotenv').config()
 export const db = knex({
     // connect to your own database here
     client: 'pg',
-    connection: env.POSTGRES_URI
+    connection: env.DATABASE_URL
   });
 
 
