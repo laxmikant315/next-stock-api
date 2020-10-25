@@ -1,0 +1,36 @@
+version:  '3.8'
+
+services:
+
+  # Backend API
+  stock-api:
+    container_name: backend
+    # image: node@12.19.0
+    build: .
+    command: "npm run dev"
+    working_dir: /usr/src/next-stock-api
+    environment: 
+      POSTGRES_URI: postgres://laksh:secret@postgres:5432/stock-app
+    links:
+      - postgres
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/usr/src/next-stock-api
+  
+  # Backend API
+  postgres:
+    environment: 
+      POSTGRES_USER: laksh
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: stock-app
+      POSTGRES_HOST: postgres
+    # image: postgres
+    build: ./postgres
+    ports:
+      - "5432:5432"
+
+
+  
+   
+

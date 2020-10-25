@@ -8,13 +8,19 @@ import { env } from 'process'
 import BullController from './controllers/bull/bull.controller'
 import SwingController from './controllers/swing/swing.controller'
 import KiteController from './controllers/kite/kite.controller'
-
+import * as knex  from 'knex';
 const cors = require('cors')
 require('dotenv').config()
 
+export const db = knex({
+    // connect to your own database here
+    client: 'pg',
+    connection: env.POSTGRES_URI
+  });
+
 
 const app = new App({
-    port: +env.PORT || 5003,
+    port: +env.PORT || 5000,
     controllers: [
         new HomeController(),
         new BullController(),

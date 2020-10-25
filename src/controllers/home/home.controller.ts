@@ -2,8 +2,8 @@ import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
 import axios from "axios";
-import Notification from "../../models/notifications";
-
+// import Notification from "../../models/notifications";
+import { db } from "../../server";
 import { env } from "process";
 import {
   getInsruments,
@@ -11,14 +11,19 @@ import {
   getHistorical,
   getSwingStocks,
 } from "./swing/swing.service";
+import Knex = require("knex");
+
 class HomeController implements IControllerBase {
   public path = "/";
   public router = express.Router();
+
 
   constructor() {
     this.initRoutes();
     // this.connectApp();
     this.startKeepAlive();
+
+
   }
   connectApp() {
     axios
@@ -44,7 +49,7 @@ class HomeController implements IControllerBase {
     this.router.get("/", this.index);
     this.router.get("/notifications", this.notifications);
     this.router.get("/appConfig", this.appConfig);
-    
+    this.router.get("/pg",this.getPg)
 
     this.router.get(
       "/api/swing/:trend",
@@ -58,6 +63,37 @@ class HomeController implements IControllerBase {
         res.send(await getSwingStocks(trend));
       }
     );
+  }
+
+  getPg(req: Request, res: Response){
+  
+    db.transaction(trx => {
+      trx.insert({
+        hash: "SAHSGAHDJHAFGHSA",
+        email: 'lrp@pg.com'
+      })
+      .into('login')
+      .returning('email')
+      .then(loginEmail => {
+        return trx('users')
+          .returning('*')
+          .insert({
+            email: loginEmail[0],
+            name: 'Laxmikant Phadke',
+            joined: new Date()
+          })
+          .then(user => {
+            res.json(user[0]);
+          })
+      })
+      .then(trx.commit)
+      .catch(trx.rollback)
+    })
+    .catch(err => {
+      console.log(err);
+
+      res.status(400).json('unable to register')
+    })
   }
   appConfig(req: Request, res: Response) {
     
@@ -80,12 +116,12 @@ class HomeController implements IControllerBase {
     if (type) {
       query.type = type;
     }
-      const data = await Notification.find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort("-createDt");
+      // const data = await Notification.find(query)
+      // .skip(skip)
+      // .limit(limit)
+      // .sort("-createDt");
 
-      res.send({data,hasMoreItems: data.length === limit })
+      // res.send({data,hasMoreItems: data.length === limit })
 
   };
 
