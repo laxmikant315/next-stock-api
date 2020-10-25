@@ -8,4 +8,4 @@ run:
 release:
     image: web
     command: 
-        - npm run migrate up
+        - npm run start
