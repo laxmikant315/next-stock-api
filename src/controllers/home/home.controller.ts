@@ -6,11 +6,9 @@ import Notification from "../../models/notifications";
 
 import { env } from "process";
 import {
-  getInsruments,
-  getVolumeStocks,
-  getHistorical,
   getSwingStocks,
 } from "./swing/swing.service";
+import { db } from "../../server";
 class HomeController implements IControllerBase {
   public path = "/";
   public router = express.Router();
@@ -44,7 +42,8 @@ class HomeController implements IControllerBase {
     this.router.get("/", this.index);
     this.router.get("/notifications", this.notifications);
     this.router.get("/appConfig", this.appConfig);
-    
+    this.router.get("/pg", this.getPg)
+
 
     this.router.get(
       "/api/swing/:trend",
@@ -60,32 +59,62 @@ class HomeController implements IControllerBase {
     );
   }
   appConfig(req: Request, res: Response) {
-    
-     const  {intradayRiskAmount} = env;
-      const config = {
-        intradayRiskAmount:+intradayRiskAmount
-      }
-      res.send(config)
+
+    const { intradayRiskAmount } = env;
+    const config = {
+      intradayRiskAmount: +intradayRiskAmount
+    }
+    res.send(config)
 
   }
 
+  getPg(req: Request, res: Response) {
+
+    db.transaction(trx => {
+      trx.insert({
+        hash: "SAHSGAHDJHAFGHSA",
+        email: 'lrp@pg.com'
+      })
+        .into('login')
+        .returning('email')
+        .then(loginEmail => {
+          return trx('users')
+            .returning('*')
+            .insert({
+              email: loginEmail[0],
+              name: 'Laxmikant Phadke',
+              joined: new Date()
+            })
+            .then(user => {
+              res.json(user[0]);
+            })
+        })
+        .then(trx.commit)
+        .catch(trx.rollback)
+    })
+      .catch(err => {
+        console.log(err);
+
+        res.status(400).json('unable to register')
+      })
+  }
   notifications = async (req: Request, res: Response) => {
     const type = req.query.type;
     const limit = +req.query.limit | 0;
     const skip = +req.query.offSet * limit;
- 
+
 
     const query: any = {};
 
     if (type) {
       query.type = type;
     }
-      const data = await Notification.find(query)
+    const data = await Notification.find(query)
       .skip(skip)
       .limit(limit)
       .sort("-createDt");
 
-      res.send({data,hasMoreItems: data.length === limit })
+    res.send({ data, hasMoreItems: data.length === limit })
 
   };
 
