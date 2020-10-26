@@ -22,7 +22,7 @@ class SwingController implements IControllerBase {
   async getAppSettings() {
     await db.select().table("appSettings")
       .then((x) => {
-
+        console.log('res', x)
         if (x["swingAmount"] && x["swingNoOfslots"]) {
 
           this.amount = x["swingAmount"];
