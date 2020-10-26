@@ -20,7 +20,7 @@ class SwingController implements IControllerBase {
   //  transactions = [];
 
   async getAppSettings() {
-    await db.select().table("appSettings")
+    db.select().table("appSettings")
       .then((x) => {
         console.log('res', x)
         if (x["swingAmount"] && x["swingNoOfslots"]) {
@@ -39,7 +39,7 @@ class SwingController implements IControllerBase {
           //   console.log('Swing amount and slots are added.')
           // });
 
-          db('appSettings').update({ swingAmount: amount, swingNoOfslots: noOfslots }).then(() => {
+          db('appSettings').first().update({ swingAmount: amount, swingNoOfslots: noOfslots }).then(() => {
             this.amount = amount;
             this.noOfslots = noOfslots;
             console.log('Swing amount and slots are added.')
