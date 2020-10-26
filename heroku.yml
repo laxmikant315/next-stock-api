@@ -4,8 +4,8 @@ build:
     docker:
       web: Dockerfile
 run:
-    web: npm run prod
+    web: npm run build
 release:
     image: web
     command: 
-        - npm run start
+        - npm run prod
