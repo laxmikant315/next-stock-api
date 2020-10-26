@@ -50,7 +50,9 @@ class SwingController implements IControllerBase {
   }
   constructor() {
     this.initRoutes();
-    this.getAppSettings();
+    this.getAppSettings().then(() => {
+      console.log('Completed')
+    });
 
   }
 
