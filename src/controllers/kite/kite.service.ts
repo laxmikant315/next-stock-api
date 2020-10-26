@@ -1,14 +1,13 @@
 import axios from "axios";
 
 import { env } from "process";
-import AppSetting from "../../models/app-settings";
 import Bull = require("bull");
 const qs = require("querystring");
-import * as mongoose from "mongoose";
 const REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
-import Order from "../../models/order";
+//@ts-ignore
 import moment = require("moment");
 import e = require("express");
+import { db } from "../../server";
 
 let mockEnabled = env.MOCK_ENABLED == "true" || false;
 
@@ -44,7 +43,8 @@ export const placeOrder = async (
       authorization: env.accessToken,
     },
   };
-  const db: any = await AppSetting.find({}).exec();
+  // const db: any = await AppSetting.find({}).exec();
+
 
   let res;
   if (mockEnabled) {
@@ -77,15 +77,29 @@ export const placeOrder = async (
       order_type,
     };
 
-    const orderObj = new Order({
-      createDt: moment().format(),
-      _id: mongoose.Types.ObjectId(),
-      ...result,
-    });
-    await orderObj
-      .save()
-      .catch((error) => console.log("Failed to save order", error));
-    console.log("Order inserted in database");
+    // const orderObj = new Order({
+    //   createDt: moment().format(),
+    //   _id: mongoose.Types.ObjectId(),
+    //   ...result,
+    // });
+    // await orderObj
+    //   .save()
+    //   .catch((error) => console.log("Failed to save order", error));
+    // console.log("Order inserted in database");
+
+
+    db.transaction(trx => {
+      trx.insert({
+        createDt: moment().format(),
+        ...result
+      })
+        .into('orders')
+        .then(trx.commit)
+        .catch(trx.rollback)
+    })
+      .catch(err => {
+        console.log("Failed to save order", err)
+      }).then(() => console.log("Order inserted in database"))
 
     return result;
   }
@@ -136,21 +150,33 @@ export const addToCronToWatch = async (
         x.placed_by === "BV7667"
     );
 
-    const orderInMyBag = await Order.findOne({
-      symbol,
-      orderNo: order.order_id,
-    }).exec();
+    // const orderInMyBag = await Order.findOne({
+    //   symbol,
+    //   orderNo: order.order_id,
+    // }).exec();
+
+    const orderInMyBag = await db('orders')
+      .where({
+        symbol,
+        orderNo: order.order_id,
+      })
 
     console.log("orderInMyBag", orderInMyBag);
     if (
       (order.status === "COMPLETE" ||
         order.status === "CANCELLED" ||
         order.status === "REJECTED") &&
-      orderInMyBag.get("status") === "PLACED"
+      orderInMyBag["status"] === "PLACED"
     ) {
-      await orderInMyBag.update({ status: order.status }, () => {
-        console.log("Order updated");
-      });
+
+      // await orderInMyBag.update({ status: order.status }, () => {
+      //   console.log("Order updated");
+      // });
+      await db('orders')
+        .where({
+          symbol,
+          orderNo: order.order_id,
+        }).update({ status: order.status }).then(() => console.log("Order updated"))
       return "CLOSE";
     }
   }
@@ -163,11 +189,11 @@ export const checkOrder = async () => {
     },
   };
 
-  if (mockEnabled) {
-    const db: any = await AppSetting.find({}).exec();
+  // if (mockEnabled) {
+  //   const db: any = await AppSetting.find({}).exec();
 
-    return db[0].mock.orders;
-  }
+  //   return db[0].mock.orders;
+  // }
   return axios
     .get(`${env.zerodhaUrl}oms/orders`, config)
     .then((x) => x.data)
@@ -179,17 +205,17 @@ export const getCurrentPrice = async (symbol) => {
       authorization: env.accessToken,
     },
   };
- 
-  if (env.MOCK_ENABLED==="true") {
-    const db: any = await AppSetting.find({}).exec();
-    console.log("")
-    const res= db[0].mock.ltp;
-    return res.data && res.data[`NSE:${symbol}`].last_price;
-  }
+
+  // if (env.MOCK_ENABLED === "true") {
+  //   const db: any = await AppSetting.find({}).exec();
+  //   console.log("")
+  //   const res = db[0].mock.ltp;
+  //   return res.data && res.data[`NSE:${symbol}`].last_price;
+  // }
 
   return axios
     .get(`${env.zerodhaUrl}quote/ltp?i=NSE:${symbol}`, config)
-    .then((x) =>  x.data && x.data[`NSE:${symbol}`].last_price)
+    .then((x) => x.data && x.data[`NSE:${symbol}`].last_price)
     .catch((e) => console.log(e.response));
 };
 
@@ -202,11 +228,11 @@ export const cancelOrder = async (order_id) => {
   };
   console.log("Order Cancelling called", order_id);
 
-  if (mockEnabled) {
-    const db: any = await AppSetting.find({}).exec();
+  // if (mockEnabled) {
+  //   const db: any = await AppSetting.find({}).exec();
 
-    return db[0].mock.orderSl;
-  }
+  //   return db[0].mock.orderSl;
+  // }
 
   return axios
     .delete(`${env.zerodhaUrl}oms/orders/regular/${order_id}`, config)

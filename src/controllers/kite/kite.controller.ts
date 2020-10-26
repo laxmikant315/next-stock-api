@@ -1,7 +1,7 @@
 import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
-import Order from "../../models/order";
+// import Order from "../../models/order";
 
 import {
   placeOrder,
@@ -11,6 +11,7 @@ import {
   getCurrentPrice,
 } from "./kite.service";
 import { pushOnApp } from "../../controllers/bull/bull.controller";
+import { db } from "server";
 
 class KiteController implements IControllerBase {
   public path = "/kite";
@@ -18,7 +19,7 @@ class KiteController implements IControllerBase {
 
   constructor() {
     this.initRoutes();
-    
+
     // this.orderWatch
     //   .add(
     //     {
@@ -52,23 +53,23 @@ class KiteController implements IControllerBase {
     const currentPrice = await getCurrentPrice(symbol);
 
 
-    let order_type="SL-M";
-    if(transaction_type==="BUY"){
-      if(currentPrice>price){
+    let order_type = "SL-M";
+    if (transaction_type === "BUY") {
+      if (currentPrice > price) {
         order_type = "LIMIT"
       }
-    }else if (transaction_type==="SELL"){
-      if(currentPrice<price){
+    } else if (transaction_type === "SELL") {
+      if (currentPrice < price) {
         order_type = "LIMIT"
       }
     }
-    
+
     const response = await placeOrder(
       symbol,
       transaction_type,
       quantity,
       price,
-      order_type ,
+      order_type,
       "order"
     );
 
@@ -104,10 +105,10 @@ class KiteController implements IControllerBase {
             orderNo
           );
           if (res === "CLOSE") {
-           
+
             console.log("Trade watch closed", job.data);
             timeQueue.close();
-            
+
             let oppTransaction = "BUY";
             if (transaction_type === "BUY") {
               oppTransaction = "SELL";
@@ -126,7 +127,7 @@ class KiteController implements IControllerBase {
             let slQueue, targetQueue;
             let slOrderNo = response.orderNo;
 
-             watchOnOrder(
+            watchOnOrder(
               "order-sl-queue",
               {
                 symbol,
@@ -164,23 +165,34 @@ class KiteController implements IControllerBase {
 
                   await cancelOrder(targetOrderNo).then(async (x) => {
                     console.log("Target Order Cancelled Response", x);
-                   await pushOnApp({
+                    await pushOnApp({
                       title: `Stoploss hitted.`,
                       body: `${symbol} ${oppTransaction} Stoploss hitted & Target Order Cancellled`,
                     });
-                    const orderInMyBag = await Order.findOne({
-                      symbol,
-                      orderNo: targetOrderNo,
-                    }).exec();
+                    // const orderInMyBag = await Order.findOne({
+                    //   symbol,
+                    //   orderNo: targetOrderNo,
+                    // }).exec();
 
-                    await orderInMyBag.update({ status: "CANCELLED" }, () => {
-                      console.log("Target Order document updated");
-                    });
+
+
+                    await db('orders')
+                      .where({
+                        symbol,
+                        orderNo: targetOrderNo,
+                      })
+                      .update({ status: "CANCELLED" }).then(x => console.log("Target Order document updated"))
+
+                      // await orderInMyBag.update({ status: "CANCELLED" }, () => {
+                      //   console.log("Target Order document updated");
+                      // });
+
+                      ;
                   });
                 }
                 return res;
               }
-            ).then(x=>{
+            ).then(x => {
               console.log('watcher added for stoploss')
             });
 
@@ -196,7 +208,7 @@ class KiteController implements IControllerBase {
               "target"
             );
             const targetOrderNo = response1.orderNo;
-             watchOnOrder(
+            watchOnOrder(
               "order-target-queue",
               {
                 symbol,
@@ -231,7 +243,7 @@ class KiteController implements IControllerBase {
                   console.log("Trade SL & Target watch closed", job.data);
                   queue.close();
                   slQueue.close();
-                  
+
 
                   await cancelOrder(slOrderNo).then(async (x) => {
                     console.log("SL Order Cancelled Response", x);
@@ -240,27 +252,36 @@ class KiteController implements IControllerBase {
                       body: `${symbol} ${oppTransaction} Target hitted & Stop-loss Order Cancellled`,
                     });
 
-                    const orderInMyBag = await Order.findOne({
-                      symbol,
-                      orderNo: slOrderNo,
-                    }).exec();
-                    await orderInMyBag.update({ status: "CANCELLED" }, () => {
-                      console.log("SL Order document updated");
-                    });
+                    // const orderInMyBag = await Order.findOne({
+                    //   symbol,
+                    //   orderNo: slOrderNo,
+                    // }).exec();
+                    // await orderInMyBag.update({ status: "CANCELLED" }, () => {
+                    //   console.log("SL Order document updated");
+                    // });
+
+
+                    await db('orders')
+                      .where({
+                        symbol,
+                        orderNo: slOrderNo,
+                      })
+                      .update({ status: "CANCELLED" }).then(x => console.log("SL Order document updated"))
+
                   });
                 }
                 return res;
               }
-            ).then(x=>{
+            ).then(x => {
               console.log('watcher added for target')
             });
 
             console.log("target added.", response);
-            await  pushOnApp({
+            await pushOnApp({
               title: `${symbol} ${transaction_type} Order Executed`,
               body: `Stoploss(${sl}) & Target${target} are placed.`,
             });
-         
+
           }
           return res;
         }

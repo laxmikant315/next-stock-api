@@ -2,8 +2,6 @@ import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
 import axios from "axios";
-import Notification from "../../models/notifications";
-
 import { env } from "process";
 import {
   getSwingStocks,
@@ -109,10 +107,11 @@ class HomeController implements IControllerBase {
     if (type) {
       query.type = type;
     }
-    const data = await Notification.find(query)
-      .skip(skip)
-      .limit(limit)
-      .sort("-createDt");
+    // const data = await Notification.find(query)
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .sort("-createDt");
+    const data = await db.select().table('notifications').limit(limit).offset(skip).orderBy("createDt", "desc");
 
     res.send({ data, hasMoreItems: data.length === limit })
 

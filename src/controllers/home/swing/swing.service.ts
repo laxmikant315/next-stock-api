@@ -5,27 +5,38 @@ import * as instruments from "./instruments.json";
 
 import axios from "axios";
 import { env } from "process";
+//@ts-ignore
 import * as moment from "moment";
-import Notification from "../../../models/notifications";
 
-import AppSettings from "../../../models/app-settings";
 
 import * as mongoose from "mongoose";
 import e = require("express");
 
 import * as mockData from "./mockData.json";
+import { db } from "server";
 var dataMain: any = [];
 
 let todaysIntradayStock;
 
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
-  await Notification.deleteMany({ type: "intraday" }).catch((e) => {
-    console.log("Failed to delete intraday stocks.", e);
-  });
-  await Notification.deleteMany({ type: "priceaction" }).catch((e) => {
-    console.log("Failed to delete intraday Logs.", e);
-  });
+
+
+  // await Notification.deleteMany({ type: "intraday" }).catch((e) => {
+  //   console.log("Failed to delete intraday stocks.", e);
+  // });
+
+  await db('notifications').del().where({ type: "intraday" }).catch(e => console.log("Failed to delete intraday stocks.", e))
+
+
+
+
+  // await Notification.deleteMany({ type: "priceaction" }).catch((e) => {
+  //   console.log("Failed to delete intraday Logs.", e);
+  // });
+
+  await db('notifications').del().where({ type: "priceaction" }).catch(e => console.log("Failed to delete intraday stocks.", e))
+
   console.log("Intraday stocks & logs deleted");
 };
 export const getDailyVolatilitedStocks = async (dateNow: string) => {
@@ -343,7 +354,7 @@ const getPriceAction = async (data, secondTry = false) => {
   let trend = "SIDEBASE";
 
   let high = firstHigh,
-  low = firstLow;
+    low = firstLow;
 
   if (
     highestHigh.highest > lastHigh.highest &&
@@ -384,9 +395,9 @@ const getPriceAction = async (data, secondTry = false) => {
     d = lowestLow.indexNo;
     e = latestCandelIndex;
   }
-  const peak = d - a ;
+  const peak = d - a;
   const volumned = e - d;
-  if (peak< volumned) {
+  if (peak < volumned) {
 
     valid = false;
 
@@ -423,7 +434,7 @@ const getPriceAction = async (data, secondTry = false) => {
 
       valid = val0 && val1 && val2;
 
- 
+
 
       if (!valid) {
         if (!val0) {
@@ -449,7 +460,7 @@ const getPriceAction = async (data, secondTry = false) => {
       const val2 = latestCandel[4] > highestHigh.highest - perGap60;
       valid = val0 && val1 && val2;
 
-   
+
 
       if (!valid) {
         if (!val0) {
@@ -544,11 +555,11 @@ const getPriceAction = async (data, secondTry = false) => {
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
-         //console.log(`lowPlus30 = low.lowest${low.lowest} + ((highestHigh.highest${highestHigh.highest}-low.lowest${low.lowest})*0.3)`)
-        
-        const lowPlus30 = low.lowest + ((highestHigh.highest-low.lowest)*0.15)
+        //console.log(`lowPlus30 = low.lowest${low.lowest} + ((highestHigh.highest${highestHigh.highest}-low.lowest${low.lowest})*0.3)`)
+
+        const lowPlus30 = low.lowest + ((highestHigh.highest - low.lowest) * 0.15)
         // console.log(`lowPlus30=${lowPlus30}`)
-       
+
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
 
           if (data[i] && data[i][3] < lowPlus30) {
@@ -559,7 +570,7 @@ const getPriceAction = async (data, secondTry = false) => {
       }
     } else if (trend === "DOWN") {
       if (lowestLow.indexNo < latestCandelIndex) {
-        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest)*0.15)
+        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest) * 0.15)
         for (let i = lowestLow.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][2] > highMinus30) {
             valid = false;
@@ -570,13 +581,13 @@ const getPriceAction = async (data, secondTry = false) => {
     if (!valid) {
       invalidReason = "Trend line validation failed";
 
-      saveLog=true;
+      saveLog = true;
     }
   }
   // Trend line validation End
 
   if (valid) {
-    
+
     const previosCandel = data[latestCandelIndex - 1];
     if (trend === "UP") {
       if (previosCandel[2] > latestCandel[4]) {
@@ -589,16 +600,16 @@ const getPriceAction = async (data, secondTry = false) => {
     }
     if (!valid) {
       invalidReason = "Previous candel of volumed candel is invalid.";
-      saveLog=true;
+      saveLog = true;
     }
   }
 
 
-  if(valid){
-    valid =  validatePriceAction({ll:lowestLow.lowest,h:high.highest,l:low.lowest,hh:highestHigh.highest,trend})
+  if (valid) {
+    valid = validatePriceAction({ ll: lowestLow.lowest, h: high.highest, l: low.lowest, hh: highestHigh.highest, trend })
     if (!valid) {
       invalidReason = "Price action HH,LL,L,H gap invalid.";
-      saveLog=true;
+      saveLog = true;
     }
   }
   //end
@@ -629,23 +640,23 @@ const getPriceAction = async (data, secondTry = false) => {
 };
 
 
-const validatePriceAction = ({h,l,hh,ll,trend}:{h:number,l:number,hh:number,ll:number,trend:string})=>{
-  const a = ((Math.abs(ll-h))*20/100);
-  const b = ((Math.abs(hh-l))*20/100);
-  
-  if(trend==="UP"){
+const validatePriceAction = ({ h, l, hh, ll, trend }: { h: number, l: number, hh: number, ll: number, trend: string }) => {
+  const a = ((Math.abs(ll - h)) * 20 / 100);
+  const b = ((Math.abs(hh - l)) * 20 / 100);
+
+  if (trend === "UP") {
     // console.log(`${l}>(${a}+${ll})[${a+ll}] && ${h}<(${hh}-${b})[${b+hh}]`)
-    if(l>(a+ll) && h<(hh-b)){
+    if (l > (a + ll) && h < (hh - b)) {
       return true
     }
-  }else if(trend==="DOWN"){
+  } else if (trend === "DOWN") {
     // console.log(`${h}<(${hh}-${b})[${hh-b}] && ${l}>(${ll}+${a})[${ll+a}]`)
-    if(h<(hh-b) && l>(ll+a)){
+    if (h < (hh - b) && l > (ll + a)) {
       return true
     }
   }
   return false
- 
+
 }
 const getDayData = async (instrumentToken, interval = "day") => {
   let from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss");
@@ -797,9 +808,9 @@ export const getDetails = async (symbol: string, type: string) => {
   }
 
   const data = await getHistorical(instrument, interval, from);
-  
+
   let priceAction = await getPriceAction(data);
- 
+
   const priceActionLength = getPriceActionLength(priceAction);
 
   let secondTry = { bit: false, priceActionLength, priceActionSecondLength: 0 };
@@ -815,7 +826,7 @@ export const getDetails = async (symbol: string, type: string) => {
     const data2 = data.slice(startIndex, data.length);
 
     const priceActionSecond = await getPriceAction(data2, true);
-   
+
     if (priceActionSecond) {
       const priceActionSecondLength = getPriceActionLength(priceActionSecond);
 
@@ -832,7 +843,7 @@ export const getDetails = async (symbol: string, type: string) => {
   if (type === "intraday" && priceAction.saveLog) {
     try {
       insertNotification({ ...priceAction, type: "priceaction", symbol });
-    } catch (error) {}
+    } catch (error) { }
   }
   const candelHeightIsValid =
     priceAction.lastCandelHeight > (priceAction.avgHeight * 60) / 100;
@@ -853,37 +864,37 @@ export const getDetails = async (symbol: string, type: string) => {
   ) {
 
 
-    if(type==="intraday"){
-      const formula = (price:number)=> Math.round((price/3000)*10)/10;
-      const properGap = (price:number)=> price / 125;
+    if (type === "intraday") {
+      const formula = (price: number) => Math.round((price / 3000) * 10) / 10;
+      const properGap = (price: number) => price / 125;
 
-      let orderPrice,sl1,target ;
-      if(priceAction.trend==="UP"){
+      let orderPrice, sl1, target;
+      if (priceAction.trend === "UP") {
 
-        const price =  priceAction.latestCandel[2];
-         orderPrice = price + formula(price);
-         sl1 = orderPrice - properGap(orderPrice)
-         target = orderPrice + properGap(orderPrice)
-        
+        const price = priceAction.latestCandel[2];
+        orderPrice = price + formula(price);
+        sl1 = orderPrice - properGap(orderPrice)
+        target = orderPrice + properGap(orderPrice)
 
-     
-      }else if(priceAction.trend==="DOWN"){
-        const price =  priceAction.latestCandel[3];
-         orderPrice = price - formula(price);
 
-         sl1 = orderPrice + properGap(orderPrice)
-         target = orderPrice - properGap(orderPrice)
-        
+
+      } else if (priceAction.trend === "DOWN") {
+        const price = priceAction.latestCandel[3];
+        orderPrice = price - formula(price);
+
+        sl1 = orderPrice + properGap(orderPrice)
+        target = orderPrice - properGap(orderPrice)
+
       }
-      orderPrice = Math.round(orderPrice*20)/20
-      sl1 = Math.round(sl1*20)/20
-      target = Math.round(target*20)/20
+      orderPrice = Math.round(orderPrice * 20) / 20
+      sl1 = Math.round(sl1 * 20) / 20
+      target = Math.round(target * 20) / 20
 
-      tradeInfo = {orderPrice,sl1,target}
-    
+      tradeInfo = { orderPrice, sl1, target }
+
     }
-    
-    
+
+
 
     const dayData = await getDayData(instrument, intervalParent);
 
@@ -942,7 +953,9 @@ const getTodaysIntradayStocks = async () => {
   //   res.map((x) => x.symbol)
   // );
 
-  const appSettings = await AppSettings.findOne().exec();
+  // const appSettings = await AppSettings.findOne().exec();
+  const appSettings = await db.select().table('appSettings');
+
 
   const intradayStocks = appSettings["intradayStocks"];
 
@@ -954,13 +967,18 @@ export const insertNotification = async (notification) => {
   const today = moment();
   let allow = false;
   if (notification.type === "swing") {
-    const stock = await Notification.findOne({
-      createDt: {
-        $gte: today.startOf("day").toDate(),
-        $lt: today.endOf("day").toDate(),
-      },
-      symbol: notification.symbol,
-    });
+    // const stock = await Notification.findOne({
+    //   createDt: {
+    //     $gte: today.startOf("day").toDate(),
+    //     $lt: today.endOf("day").toDate(),
+    //   },
+    //   symbol: notification.symbol,
+    // });
+
+    const stock = await db.select().table('notifications').where({ symbol: notification.symbol }).whereBetween('createdAt', [today.startOf("day").toDate(), today.endOf("day").toDate()]);
+
+
+
     if (!stock) {
       allow = true;
     }
@@ -974,9 +992,26 @@ export const insertNotification = async (notification) => {
       _id: mongoose.Types.ObjectId(),
       ...notification,
     });
-    await notificationObj
-      .save()
-      .catch((error) => console.log("Failed to save notification", error));
+
+
+    // await notificationObj
+    //   .save()
+    //   .catch((error) => console.log("Failed to save notification", error));
+
+
+    db.transaction(trx => {
+      trx.insert({
+        createDt: moment().format(),
+        ...notification
+      })
+        .into('notifications')
+        .then(trx.commit)
+        .catch(trx.rollback)
+    })
+      .catch(err => {
+        console.log("Failed to save notification", err)
+
+      })
     console.log("Document inserted");
     return true;
   }
@@ -1018,15 +1053,14 @@ export const getSwingStocks = async (type: string, trend?: string) => {
 
       // const finalStocks= ["SWSOLAR","TV18BRDCST"]
       console.log("Total Stocks", finalStocks.length);
-      
-      if(type==="intraday"){
+
+      if (type === "intraday") {
         finalStocks.push("NIFTY 50")
       }
       for (let x of finalStocks) {
         try {
           console.log(
-            `Process(${finalStocks.indexOf(x) + 1}/${
-              finalStocks.length
+            `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length
             }) STOCK=>${x}`
           );
 
