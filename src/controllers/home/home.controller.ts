@@ -13,7 +13,6 @@ class HomeController implements IControllerBase {
 
   constructor() {
     this.initRoutes();
-    // this.connectApp();
     this.startKeepAlive();
   }
   connectApp() {
@@ -43,6 +42,7 @@ class HomeController implements IControllerBase {
     this.router.get("/pg", this.getPg)
 
 
+
     this.router.get(
       "/api/swing/:trend",
       async (req: Request, res: Response) => {
@@ -69,24 +69,36 @@ class HomeController implements IControllerBase {
   getPg(req: Request, res: Response) {
 
     db.transaction(trx => {
-      trx.insert({
-        hash: "SAHSGAHDJHAFGHSA",
-        email: 'lrp@pg.com'
+      trx("notifications").returning("*").insert({
+
+        createDt: new Date(),
+        instrument: "97281",
+        goodOne: true,
+        avgHeight: 19.897368421052636,
+        lastHeight: 68.35000000000002,
+        trend: "UP",
+        valid: true,
+        symbol: "BBTC",
+        avgCandelSize: 105.46,
+        todayCandelSize: 16,
+        allowedCandelSize: 73.82,
+        highestHigh: 987.6,
+        highestHighIndex: 14,
+
+        lowestLow: 675.35,
+        lowestLowIndex: 0,
+        high: 854.3,
+        highIndex: 5,
+
+        low: 771.1,
+        lowIndex: 7,
+
+        lastCandelIsGreen: true,
+        currentPrice: 905,
+        type: "swing"
+
       })
-        .into('login')
-        .returning('email')
-        .then(loginEmail => {
-          return trx('users')
-            .returning('*')
-            .insert({
-              email: loginEmail[0],
-              name: 'Laxmikant Phadke',
-              joined: new Date()
-            })
-            .then(user => {
-              res.json(user[0]);
-            })
-        })
+        .then(notifications => res.json(notifications))
         .then(trx.commit)
         .catch(trx.rollback)
     })
@@ -98,20 +110,19 @@ class HomeController implements IControllerBase {
   }
   notifications = async (req: Request, res: Response) => {
     const type = req.query.type;
-    const limit = +req.query.limit | 0;
-    const skip = +req.query.offSet * limit;
-
+    const limit: number | null = +req.query.limit || null;
+    const skip = (+req.query.offSet * limit) | 0;
 
     const query: any = {};
 
     if (type) {
       query.type = type;
     }
-    // const data = await Notification.find(query)
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .sort("-createDt");
-    const data = await db.select().table('notifications').limit(limit).offset(skip).orderBy("createDt", "desc");
+
+    const data = await db.select().table('notifications').where({ type })
+      .limit(limit,)
+      .offset(skip)
+      .orderBy("createDt", "desc");
 
     res.send({ data, hasMoreItems: data.length === limit })
 
@@ -119,31 +130,7 @@ class HomeController implements IControllerBase {
 
 
   index = (req: Request, res: Response) => {
-    // const todos = await (
-    //   await axios.get("https://jsonplaceholder.typicode.com/todos")
-    // ).data;
 
-    // const db = await MongoClient.connect(process.env.MONGO_URL);
-
-    // const dbo = db.db("heroku_nmpf1dzg");
-    // let notifications = await dbo.collection("notifications").find().toArray() ;
-
-    // db.close();
-    // console.log(todos)
-    // const todos = [
-    //     {
-    //       id: 1,
-    //       title: "Ali",
-    //     },
-    //     {
-    //       id: 2,
-    //       title: "Can",
-    //     },
-    //     {
-    //       id: 3,
-    //       title: "Ahmet",
-    //     },
-    //   ];
     const users = [
       {
         id: 1,

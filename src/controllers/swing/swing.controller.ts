@@ -20,26 +20,20 @@ class SwingController implements IControllerBase {
   //  transactions = [];
 
   async getAppSettings() {
-    db.select().table("appSettings")
+    db.first().table("appSettings")
       .then((x) => {
-        console.log('res', x)
-        if (x["swingAmount"] && x["swingNoOfslots"]) {
+
+        if (x.swingAmount && x.swingNoOfSlots) {
 
           this.amount = x["swingAmount"];
-          this.noOfslots = x["swingNoOfslots"];
+          this.noOfslots = x["swingNoOfSlots"];
         } else {
-          console.log('AppS')
+
           const amount = 10000,
             noOfslots = 10;
 
-          // AppSettings.updateOne({}, { swing: { amount, noOfslots } }).then((y) => {
 
-          //   this.amount = amount;
-          //   this.noOfslots = noOfslots;
-          //   console.log('Swing amount and slots are added.')
-          // });
-
-          db('appSettings').first().update({ swingAmount: amount, swingNoOfslots: noOfslots }).then(() => {
+          db('appSettings').first().update({ swingAmount: amount, swingNoOfSlots: noOfslots }).then(() => {
             this.amount = amount;
             this.noOfslots = noOfslots;
             console.log('Swing amount and slots are added.')
