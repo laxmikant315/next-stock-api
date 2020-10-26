@@ -19,10 +19,8 @@ class SwingController implements IControllerBase {
 
   //  transactions = [];
 
-  constructor() {
-    this.initRoutes();
-
-    db("appSettings").select()
+  async getAppSettings() {
+    await db.select().table("appSettings")
       .then((x) => {
 
         if (x["swingAmount"] && x["swingNoOfslots"]) {
@@ -49,6 +47,11 @@ class SwingController implements IControllerBase {
 
         }
       });
+  }
+  constructor() {
+    this.initRoutes();
+    this.getAppSettings();
+
   }
 
   public initRoutes() {

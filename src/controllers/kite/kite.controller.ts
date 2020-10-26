@@ -11,7 +11,7 @@ import {
   getCurrentPrice,
 } from "./kite.service";
 import { pushOnApp } from "../../controllers/bull/bull.controller";
-import { db } from "server";
+import { db } from "../../server";
 
 class KiteController implements IControllerBase {
   public path = "/kite";

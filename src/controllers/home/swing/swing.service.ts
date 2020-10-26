@@ -13,7 +13,7 @@ import * as mongoose from "mongoose";
 import e = require("express");
 
 import * as mockData from "./mockData.json";
-import { db } from "server";
+import { db } from "../../../server";
 var dataMain: any = [];
 
 let todaysIntradayStock;

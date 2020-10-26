@@ -10,10 +10,9 @@ import {
 } from "../../controllers/home/swing/swing.service";
 import moment = require("moment");
 
-import Subscription from "../../models/subscription";
 import { sockets } from "../../app";
-import ExpoPushToken from "../../models/ExpoPushToken";
 import axios from "axios";
+import { db } from "../../server";
 
 const webpush = require("web-push");
 
@@ -99,7 +98,7 @@ class BullController implements IControllerBase {
 
   swingQueue = new Bull("swing-queue", this.REDIS_URL);
   intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
-  
+
 
   // dailyQueue = new Bull("daily-queue", this.REDIS_URL);
 
@@ -143,7 +142,7 @@ class BullController implements IControllerBase {
         await deleteIntradayStocks();
       });
 
-     
+
 
       this.swingQueue.process(async (job) => {
         console.log("process started", job.data);
@@ -154,11 +153,10 @@ class BullController implements IControllerBase {
         console.log("Intraday job started", job.data);
         return this.getStocks("intraday");
       });
-     
+
       this.swingQueue.on("completed", (job, result) => {
         console.log(
-          `Cron Job completed with result on ${
-            this.cronSwing
+          `Cron Job completed with result on ${this.cronSwing
           } , result=> ${JSON.stringify(result, null, 2)}`
         );
       });
@@ -168,7 +166,7 @@ class BullController implements IControllerBase {
   }
   // const result =this. validatePriceAction({ll:150.5,h:156.4,l:152.6,hh:156.45,trend:"UP"})
 
-   
+
 
 
   async getStocks(type: string) {
@@ -204,7 +202,8 @@ class BullController implements IControllerBase {
               body: `${d.symbol} created ${d.trend.toLowerCase()} trend`,
             });
 
-            const subscriptions = await Subscription.find();
+            // const subscriptions = await Subscription.find();
+            const subscriptions = await db('subscriptions').select();
             if (subscriptions) {
               for (let sub of subscriptions) {
                 webpush.sendNotification(sub, payload).catch((error) => {
@@ -230,7 +229,7 @@ class BullController implements IControllerBase {
         repeat: { cron: this.cronSwing },
       }
     );
-    
+
     await this.intradayQueue.add(
       {},
       {
@@ -291,7 +290,7 @@ class BullController implements IControllerBase {
         socket.emit("FromAPI", testData);
       }
 
-      const subscriptions = await Subscription.find();
+      const subscriptions = await db('subscriptions').select();
       for (let sub of subscriptions) {
         webpush.sendNotification(sub, payload).catch((error) => {
           console.error(error.stack);
@@ -306,18 +305,39 @@ class BullController implements IControllerBase {
     this.router.post("/subscribe", async (req, res) => {
       const subscription = req.body;
 
-      const exists = await Subscription.findOne({
-        "keys.auth": subscription.keys.auth,
-        "keys.p256dh": subscription.keys.p256dh,
-      }).exec();
+      // const exists = await Subscription.findOne({
+      //   "keys.auth": subscription.keys.auth,
+      //   "keys.p256dh": subscription.keys.p256dh,
+      // }).exec();
+
+      const exists = await db('subscriptions').select().where({
+        "keysAuth": subscription.keys.auth,
+        "p256dh": subscription.keys.p256dh,
+      });
+
       // const exists = this.subscriptionMain.find(
       //   (x) =>
       //     x.keys.auth === subscription.keys.auth &&
       //     x.keys.p256dh === subscription.keys.p256dh
       // );
       if (!exists) {
-        const sub = new Subscription(subscription);
-        sub.save().then((x) => console.log("New Subscription added."));
+        // const sub = new Subscription(subscription);
+
+        // sub.save().then((x) => console.log("New Subscription added."));
+
+
+        db.transaction(trx => {
+          trx.insert({
+            "keysAuth": subscription.keys.auth,
+            "p256dh": subscription.keys.p256dh,
+          })
+            .into('subscriptions')
+            .then(trx.commit)
+            .catch(trx.rollback)
+        })
+          .catch(err => {
+            console.log("Failed to save subscription", err)
+          }).then(() => console.log("subscription inserted in database"))
       }
 
       res.status(201).json({});
@@ -337,13 +357,31 @@ class BullController implements IControllerBase {
 
     this.router.post("/registerPush", async (req, res) => {
       const { expoPushToken: token } = req.body;
-      const exists = await ExpoPushToken.findOne({
-        token,
-      }).exec();
+      // const exists = await ExpoPushToken.findOne({
+      //   token,
+      // }).exec();
+
+      const exists = await db('expoPushTokens').select().where({
+        token
+      });
+
 
       if (!exists) {
-        const sub = new ExpoPushToken({ token });
-        sub.save().then((x) => console.log("New Expo Token added."));
+        // const sub = new ExpoPushToken({ token });
+        // sub.save().then((x) => console.log("New Expo Token added."));
+
+
+        db.transaction(trx => {
+          trx.insert({
+            token
+          })
+            .into('expoPushTokens')
+            .then(trx.commit)
+            .catch(trx.rollback)
+        })
+          .catch(err => {
+            console.log("Failed to save expo token", err)
+          }).then(() => console.log("New Expo Token added."))
       }
 
       res.status(201).json({});
@@ -352,10 +390,9 @@ class BullController implements IControllerBase {
     this.router.get("/pushOnApp", async (req, res) => {
       await pushOnApp({
         title: `${testData.symbol} STOCK UPDATE`,
-        body: `${
-          testData.symbol
-        } created ${testData.trend.toLowerCase()} trend`
-     
+        body: `${testData.symbol
+          } created ${testData.trend.toLowerCase()} trend`
+
       });
       res.status(201).json({});
       // const response = await fetch('https://exp.host/--/api/v2/push/send', {
@@ -374,7 +411,7 @@ class BullController implements IControllerBase {
 export default BullController;
 
 export const pushOnApp = async ({ title, body, data }: any) => {
-  const tokens: any = await ExpoPushToken.find();
+  const tokens: any = await db('expoPushTokens').select();
   for (let sub of tokens) {
     let message = {
       to: sub.token,
@@ -384,16 +421,16 @@ export const pushOnApp = async ({ title, body, data }: any) => {
       data: { data: "Laxmikant" },
       _displayInForeground: true,
     };
- 
-      message = {
-        to: sub.token,
-        sound: "default",
-        title,
-        body,
-        data: { data },
-        _displayInForeground: true,
-      };
-    
+
+    message = {
+      to: sub.token,
+      sound: "default",
+      title,
+      body,
+      data: { data },
+      _displayInForeground: true,
+    };
+
 
     console.log(message);
     await axios

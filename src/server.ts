@@ -25,7 +25,7 @@ const app = new App({
         new HomeController(),
         new BullController(),
         new SwingController(),
-        new KiteController()
+        // new KiteController()
     ],
     middleWares: [
         bodyParser.json(),

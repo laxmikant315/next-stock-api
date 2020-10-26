@@ -3,22 +3,22 @@ import { Application } from "express";
 // import mongoose from 'mongoose'
 import * as  http from 'http'
 import * as socketIo from "socket.io";
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 import { env } from "process";
 
 export const sockets = [];
 class App {
-    
-  
+
+
   public app: Application;
   public port: number;
   public io: socketIo.Server;
 
-  public getApiAndEmit = (socket)=>{
+  public getApiAndEmit = (socket) => {
     const response = new Date();
     // Emitting a new message. Will be consumed by the client
     socket.emit("FromAPI", response);
-  
+
   };
   server: http.Server;
   constructor(appInit: { port: number; middleWares: any; controllers: any }) {
@@ -26,7 +26,7 @@ class App {
     this.server = http.createServer(this.app);
     this.io = socketIo(this.server);
     let interval;
- 
+
     this.io.on("connection", (socket) => {
       console.log("New client connected");
       if (interval) {
@@ -35,7 +35,7 @@ class App {
 
       sockets.push(socket);
       // interval = setInterval(() => this.getApiAndEmit(socket), 1000);
-      
+
 
 
       socket.on("disconnect", () => {
@@ -59,14 +59,14 @@ class App {
       this.app.use(middleWare);
     });
 
-    console.log("Database is connecting.");
+    // console.log("Database is connecting.");
 
-    await mongoose.connect(env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // await mongoose.connect(env.MONGO_URL, {
+    //   useNewUrlParser: true,
+    //   useUnifiedTopology: true,
+    // });
 
-    console.log("Database connected.");
+    // console.log("Database connected.");
   }
 
   private routes(controllers: {
