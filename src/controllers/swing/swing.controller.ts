@@ -88,8 +88,8 @@ class SwingController implements IControllerBase {
   };
 
   executeOut = async (req: Request, res: Response) => {
-    // const { symbol, orderPrice } = req.body;
-    const symbol = "HDFC", orderPrice = 470.55
+    const { symbol, orderPrice } = req.body;
+    // const symbol = "HDFC", orderPrice = 470.55
     // const exists = await Slot.findOne({ symbol });
     const exists = await db('slots').where({ symbol }).first();
 
@@ -125,8 +125,8 @@ class SwingController implements IControllerBase {
   };
 
   execute = async (req: Request, res: Response) => {
-    // const { symbol, orderPrice } = req.body;
-    const symbol = "HDFC", orderPrice = 455.55
+    const { symbol, orderPrice } = req.body;
+    // const symbol = "HDFC", orderPrice = 455.55
 
     // const slotsLength = await Slot.find().then((x) => x.length);
     const slotsLength = await db('slots').select().then(x => x.length);
