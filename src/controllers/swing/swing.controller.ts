@@ -2,9 +2,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
 
-//@ts-ignore
 import moment = require("moment");
-import * as mongoose from "mongoose";
 import { db } from "../../server";
 
 class SwingController implements IControllerBase {
@@ -61,10 +59,11 @@ class SwingController implements IControllerBase {
 
   updateAmount = async () => {
     // await AppSettings.updateOne({}, { swing: { amount: this.amount, noOfslots: this.noOfslots } });
-    await db('appSettings').update({ swingAmount: this.amount, swingNoOfslots: this.noOfslots });
+    await db('appSettings').first().update({ swingAmount: this.amount, swingNoOfSlots: this.noOfslots });
   };
   addRemoveAmount = async (req: Request, res: Response) => {
     const { amount, action } = req.body;
+
     const oldAmount = this.amount;
     if (action === "ADD") {
       this.amount += amount;
@@ -89,11 +88,12 @@ class SwingController implements IControllerBase {
   };
 
   executeOut = async (req: Request, res: Response) => {
-    const { symbol, orderPrice } = req.body;
+    // const { symbol, orderPrice } = req.body;
+    const symbol = "HDFC", orderPrice = 470.55
     // const exists = await Slot.findOne({ symbol });
-    const exists = await db('slots').where({ symbol });
+    const exists = await db('slots').where({ symbol }).first();
 
-
+    console.log(exists)
     if (!exists) {
       res.send({ resCode: "STOCK_NOT_FOUND" });
       return;
@@ -102,6 +102,7 @@ class SwingController implements IControllerBase {
     this.amount += closingAmount;
 
     await this.updateAmount();
+
 
     // await Slot.deleteOne({ symbol: symbol });
     await db('slots').del().where({ symbol });
@@ -116,17 +117,20 @@ class SwingController implements IControllerBase {
       createdOn: moment().format(),
     };
 
+    console.log('item', item)
     // await item.save().catch((error) => console.log("Failed to save transaction", error));
-    await db('slots').where({ symbol }).update(item).catch((error) => console.log("Failed to save transaction", error));
+    await db('transactions').update(item).where({ symbol }).catch((error) => console.log("Failed to save transaction", error));
 
     res.send({ symbol, balancedAmount: this.amount, resCode: "EXECUTED" });
   };
 
   execute = async (req: Request, res: Response) => {
-    const { symbol, orderPrice } = req.body;
+    // const { symbol, orderPrice } = req.body;
+    const symbol = "HDFC", orderPrice = 455.55
 
     // const slotsLength = await Slot.find().then((x) => x.length);
-    const slotsLength = await db('slots').then(x => x.length);
+    const slotsLength = await db('slots').select().then(x => x.length);
+
     if (slotsLength === this.noOfslots) {
       res.send({ resCode: "SLOTS_ARE_FULL" });
       return;
@@ -134,7 +138,8 @@ class SwingController implements IControllerBase {
 
     if (slotsLength) {
       // const exists = await Slot.exists({ symbol });
-      const exists = await db('slots').where({ symbol });
+      const exists = await db('slots').where({ symbol }).then(x => x.length);
+
       if (exists) {
         res.send({ resCode: "STOCK_ALREADY_EXISTS" });
         return;
@@ -166,7 +171,6 @@ class SwingController implements IControllerBase {
     await this.updateAmount();
 
     const item = {
-      _id: mongoose.Types.ObjectId(),
       type: "IN",
       symbol,
       orderPrice,
