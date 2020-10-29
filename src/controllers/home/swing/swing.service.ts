@@ -954,8 +954,7 @@ const getTodaysIntradayStocks = async () => {
   // );
 
   // const appSettings = await AppSettings.findOne().exec();
-  const appSettings = await db.select().table('appSettings');
-
+  const appSettings = await db.select().table('appSettings').first();
 
   const intradayStocks = appSettings["intradayStocks"];
 
