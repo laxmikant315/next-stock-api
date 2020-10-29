@@ -614,14 +614,19 @@ const getPriceAction = async (data, secondTry = false) => {
   }
   //end
 
+  console.log('trendLine', trendLine)
 
 
 
   return {
-    highestHigh,
-    lowestLow,
-    high,
-    low,
+    highestHigh: highestHigh.highest,
+    highestHighIndex: highestHigh.indexNo,
+    lowestLow: lowestLow.lowest,
+    lowestLowIndex: lowestLow.indexNo,
+    high: high.highest,
+    highIndex: high.indexNo,
+    low: low.lowest,
+    lowIndex: low.indexNo,
     totalCandels,
     per60,
     trend,
@@ -635,7 +640,7 @@ const getPriceAction = async (data, secondTry = false) => {
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
     trendLine,
-    saveLog
+    saveLog: true
   };
 };
 
@@ -816,6 +821,7 @@ export const getDetails = async (symbol: string, type: string) => {
   let secondTry = { bit: false, priceActionLength, priceActionSecondLength: 0 };
 
   if (priceAction && !priceAction.valid) {
+
     let startIndex;
     if (priceAction.trend === "UP") {
       startIndex = priceAction.highestHigh.indexNo;
@@ -842,7 +848,8 @@ export const getDetails = async (symbol: string, type: string) => {
   }
   if (type === "intraday" && priceAction.saveLog) {
     try {
-      insertNotification({ ...priceAction, type: "priceaction", symbol });
+      const { saveLog, firstHourData, latestCandel, per60, totalCandels, ...rest } = priceAction;
+      insertNotification({ ...rest, type: "priceaction", symbol });
     } catch (error) { }
   }
   const candelHeightIsValid =
@@ -986,11 +993,10 @@ export const insertNotification = async (notification) => {
   }
 
   if (allow) {
-    const notificationObj = new Notification({
+    const notificationObj = {
       createDt: moment().format(),
-      _id: mongoose.Types.ObjectId(),
       ...notification,
-    });
+    };
 
 
     // await notificationObj

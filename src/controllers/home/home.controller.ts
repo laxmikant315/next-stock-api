@@ -19,7 +19,7 @@ class HomeController implements IControllerBase {
     axios
       .get("https://next-stock-31.herokuapp.com")
       .then((x) => {
-        console.log("app connected", x);
+        console.log("app connected");
       })
       .catch((e) => {
         console.log("app disconnected", e);
