@@ -186,10 +186,10 @@ export const getHistorical = async (
   from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss"),
   to = moment().format("YYYY-MM-DD+HH:mm:ss")
 ) => {
-  return mockData.data.candles;
+  // return mockData.data.candles;
 
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
-
+  console.log(url)
   return await axios
     .get(url, {
       headers: {
@@ -232,7 +232,6 @@ const getLastestVolumendCandel = (data: any) => {
 const getCandelIsGreen = (candel) => candel && candel[1] < candel[4];
 const getPriceAction = async (data, secondTry = false) => {
   let avgHeight = 0;
-
   if (!data) {
     return null;
   }
@@ -614,7 +613,6 @@ const getPriceAction = async (data, secondTry = false) => {
   }
   //end
 
-  console.log('trendLine', trendLine)
 
 
 
@@ -811,7 +809,7 @@ export const getDetails = async (symbol: string, type: string) => {
   } else if (interval === "day") {
     from = moment().add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
   }
-
+  console.log('from', from)
   const data = await getHistorical(instrument, interval, from);
 
   let priceAction = await getPriceAction(data);

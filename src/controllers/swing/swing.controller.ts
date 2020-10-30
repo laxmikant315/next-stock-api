@@ -125,7 +125,7 @@ class SwingController implements IControllerBase {
   };
 
   execute = async (req: Request, res: Response) => {
-    const { symbol, orderPrice } = req.body;
+    const { symbol, orderPrice, force, forceQty } = req.body;
     // const symbol = "HDFC", orderPrice = 455.55
 
     // const slotsLength = await Slot.find().then((x) => x.length);
@@ -154,17 +154,35 @@ class SwingController implements IControllerBase {
 
     const amountForThisOrder = this.amount / (this.noOfslots - slotsLength);
 
-    const qty = Math.floor(amountForThisOrder / orderPrice);
+    const qty = force ? forceQty : Math.floor(amountForThisOrder / orderPrice);
 
     const investedAmount = orderPrice * qty;
 
+    let noOfSlots = 1;
+
+    console.log(`investedAmount${investedAmount}}amount${this.amount}qty${qty}`)
     if (!this.amount || !investedAmount || this.amount < investedAmount) {
+
       res.send({
         resCode: "AMOUNT_IS_NOT_AVAILABLE",
         balancedAmount: this.amount,
         amountAllotedForThisOrder: amountForThisOrder,
       });
+
       return;
+
+    } else if (force) {
+      console.log(`condition${(this.amount - investedAmount)}`)
+      if ((this.amount - investedAmount) >= 0) {
+
+        noOfSlots = Math.ceil(investedAmount / amountForThisOrder);
+        console.log(`noOfSlots${noOfSlots}investedAmount${investedAmount}amountForThisOrder${amountForThisOrder}`)
+        if (slotsLength + noOfSlots === this.noOfslots) {
+          res.send({ resCode: "SLOTS_IS_NOT_AVAIABLE" });
+          return;
+        }
+
+      }
     }
     this.amount = this.amount - investedAmount;
 
@@ -172,6 +190,7 @@ class SwingController implements IControllerBase {
 
     const item = {
       type: "IN",
+      noOfSlots,
       symbol,
       orderPrice,
       balancedAmount: this.amount,
