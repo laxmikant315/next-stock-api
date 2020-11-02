@@ -1058,7 +1058,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
       console.log("Total Stocks", finalStocks.length);
 
       if (type === "intraday") {
-        finalStocks.push("NIFTY 50")
+        // finalStocks.push("NIFTY 50")
       }
       for (let x of finalStocks) {
         try {
