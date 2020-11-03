@@ -17,7 +17,7 @@ class HomeController implements IControllerBase {
   }
   connectApp() {
     axios
-      .get("https://next-stock-31.herokuapp.com")
+      .get("https://next-stock-ps.herokuapp.com")
       .then((x) => {
         console.log("app connected");
       })
@@ -113,17 +113,16 @@ class HomeController implements IControllerBase {
     const limit: number | null = +req.query.limit || null;
     const skip = (+req.query.offSet * limit) | 0;
 
-    const query: any = {};
 
-    if (type) {
-      query.type = type;
-    }
 
-    const data = await db.select().table('notifications').where({ type })
-      .limit(limit,)
+    const query = db.select().table('notifications').where({ type })
       .offset(skip)
       .orderBy("createDt", "desc");
 
+    if (limit) {
+      query.limit(limit)
+    }
+    const data = await query;
     res.send({ data, hasMoreItems: data.length === limit })
 
   };
