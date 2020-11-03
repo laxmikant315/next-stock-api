@@ -860,7 +860,7 @@ export const getDetails = async (symbol: string, type: string) => {
   ) {
     console.log(`Volumed candel's height is invalid for stock ${symbol}`);
   }
-  let tradeInfo;
+  let tradeInfoOrderPrice, tradeInfoSl1, tradeInfoTarget;
 
   if (
     priceAction.currentPrice > 100 &&
@@ -895,7 +895,10 @@ export const getDetails = async (symbol: string, type: string) => {
       sl1 = Math.round(sl1 * 20) / 20
       target = Math.round(target * 20) / 20
 
-      tradeInfo = { orderPrice, sl1, target }
+      // tradeInfo = { orderPrice, sl1, target }
+      tradeInfoOrderPrice = orderPrice;
+      tradeInfoSl1 = sl1;
+      tradeInfoTarget = target
 
     }
 
@@ -936,7 +939,7 @@ export const getDetails = async (symbol: string, type: string) => {
       currentPrice,
       trendLine,
       secondTry,
-      tradeInfo
+      tradeInfoOrderPrice, tradeInfoSl1, tradeInfoTarget
     };
 
 
