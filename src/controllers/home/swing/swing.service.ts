@@ -816,7 +816,7 @@ export const getDetails = async (symbol: string, type: string) => {
 
   const priceActionLength = getPriceActionLength(priceAction);
 
-  let secondTry = { bit: false, priceActionLength, priceActionSecondLength: 0 };
+  let secondTry = false, secondTryPriceActionLength = 0, secondTryPriceActionSecondLength = 0;
 
   if (priceAction && !priceAction.valid) {
 
@@ -836,7 +836,10 @@ export const getDetails = async (symbol: string, type: string) => {
 
       if (priceActionSecond && priceActionSecondLength > priceActionLength) {
         priceAction = priceActionSecond;
-        secondTry = { bit: true, priceActionLength, priceActionSecondLength };
+        // secondTry = { bit: true, priceActionLength, priceActionSecondLength };
+        secondTry = true;
+        secondTryPriceActionLength = priceActionLength;
+        secondTryPriceActionSecondLength = priceActionSecondLength
       }
     }
   }
@@ -939,6 +942,8 @@ export const getDetails = async (symbol: string, type: string) => {
       currentPrice,
       trendLine,
       secondTry,
+      secondTryPriceActionLength,
+      secondTryPriceActionSecondLength,
       tradeInfoOrderPrice, tradeInfoSl1, tradeInfoTarget
     };
 
