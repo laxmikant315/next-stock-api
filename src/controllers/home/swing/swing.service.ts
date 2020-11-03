@@ -982,7 +982,7 @@ export const insertNotification = async (notification) => {
     //   symbol: notification.symbol,
     // });
 
-    const stock = await db.select().table('notifications').where({ symbol: notification.symbol }).whereBetween('createdAt', [today.startOf("day").toDate(), today.endOf("day").toDate()]);
+    const stock = await db.select().table('notifications').where({ symbol: notification.symbol }).whereBetween('createDt', [today.startOf("day").toDate(), today.endOf("day").toDate()]);
 
 
 
