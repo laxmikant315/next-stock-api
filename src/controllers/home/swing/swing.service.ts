@@ -1048,6 +1048,9 @@ export const getSwingStocks = async (type: string, trend?: string) => {
       let finalStocks = symbols;
 
       if (type === "intraday") {
+        if (!todaysIntradayStock) {
+          await getIntradayStocks();
+        }
         finalStocks = symbols.filter((x) =>
           todaysIntradayStock.includes(x)
         );
