@@ -58,10 +58,13 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
 const nifty200 = "46553",
   nifty100 = "33619";
 export const getVolumeStocks = async (interval = "5minute") => {
+
+  const daysAgo = 15
+
   let scan_clause = `%7B${nifty200}%7D+(+%5B+0+%5D+5+minute+volume+%3E+(+(+%5B+-1+%5D+5+minute+volume+%2B+%5B+-2+%5D+5+minute+volume+%2B+%5B+-3+%5D+5+minute+volume+)+%2F+3+)+*+2+)`;
   if (interval === "day") {
     scan_clause =
-      "(+%7B57960%7D+(+latest+volume+%3E+(+(+1+day+ago+volume+%2B+2+days+ago+volume+%2B+3+days+ago+volume+%2B+4+days+ago+volume+%2B+5+days+ago+volume+)+%2F+5+)+*+2.5+)+)+";
+      `(+%7B57960%7D+(+${daysAgo ? `${daysAgo}+day+ago` : 'latest'}+volume+%3E+(+(+${daysAgo + 1}+day+ago+volume+%2B+${daysAgo + 2}+days+ago+volume+%2B+${daysAgo + 3}+days+ago+volume+%2B+${daysAgo + 4}+days+ago+volume+%2B+${daysAgo + 5}+days+ago+volume+)+%2F+5+)+*+2.5+)+)+`;
   }
 
   return await axios
