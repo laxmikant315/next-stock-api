@@ -129,7 +129,7 @@ class SwingController implements IControllerBase {
     // const symbol = "HDFC", orderPrice = 455.55
 
     // const slotsLength = await Slot.find().then((x) => x.length);
-    const slotsLength: any = await db('slots').sum("noOfSlots");
+    const slotsLength: any = await db('slots').sum({ noOfSlots: "noOfSlots" }) || 0;
     console.log('slotsLength', slotsLength)
     if (slotsLength === this.noOfslots) {
       res.send({ resCode: "SLOTS_ARE_FULL" });
