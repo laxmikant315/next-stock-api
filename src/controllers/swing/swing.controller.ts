@@ -101,7 +101,6 @@ class SwingController implements IControllerBase {
     const closingAmount = orderPrice * exists["qty"];
     this.amount += closingAmount;
 
-    await this.updateAmount();
 
 
     // await Slot.deleteOne({ symbol: symbol });
@@ -120,6 +119,8 @@ class SwingController implements IControllerBase {
     console.log('item', item)
     // await item.save().catch((error) => console.log("Failed to save transaction", error));
     await db('transactions').update(item).where({ symbol }).catch((error) => console.log("Failed to save transaction", error));
+    await this.updateAmount();
+
 
     res.send({ symbol, balancedAmount: this.amount, resCode: "EXECUTED" });
   };
@@ -193,7 +194,6 @@ class SwingController implements IControllerBase {
     }
     this.amount = this.amount - investedAmount;
 
-    await this.updateAmount();
 
     const item = {
       type: "IN",
@@ -221,7 +221,10 @@ class SwingController implements IControllerBase {
     })
       .catch(err => {
         console.log("Failed to save slot", err)
-      }).then(() => console.log("Slot inserted in database"))
+      }).then(async () => {
+
+        console.log("Slot inserted in database")
+      })
 
     // const tran = new Transaction(item);
     // await tran
@@ -237,6 +240,8 @@ class SwingController implements IControllerBase {
       .catch(err => {
         console.log("Failed to save transaction", err)
       }).then(() => console.log("Transaction inserted in database"))
+
+    await this.updateAmount();
 
     // this.slots.push(item);
     // this.transactions.push(item);
