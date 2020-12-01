@@ -134,7 +134,7 @@ class SwingController implements IControllerBase {
     console.log('noOfSlotsDb', noOfSlotsDb)
 
     if (noOfSlotsDb && noOfSlotsDb.length) {
-      slotsLength = noOfSlotsDb.reduce((x, y) => x + y)
+      slotsLength = noOfSlotsDb.map(x => x.noOfSlots).reduce((x, y) => x + y)
       console.log('slotsLength', slotsLength)
 
     }
