@@ -937,6 +937,8 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
     } = priceAction;
     const data = {
       instrument,
+
+      date: type === "intraday" ? null : swingDate,
       goodOne,
       avgHeight,
       lastHeight,
@@ -1094,11 +1096,10 @@ export const getSwingStocks = async (type: string, trend?: string) => {
           const data = await getDetails(x, type, swingDate);
           if (type === "intraday") {
             console.log("Data ", data);
-          } else {
-            x.date = moment(swingDate);
           }
 
           if (data) {
+
             if (
               type === "intraday" ||
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
