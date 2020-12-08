@@ -1020,11 +1020,11 @@ export const insertNotification = async (notification) => {
     //   .save()
     //   .catch((error) => console.log("Failed to save notification", error));
 
-
+    const { date, ...rest } = notification;
     db.transaction(trx => {
       trx.insert({
-        createDt: moment().format(),
-        ...notification
+        createDt: today.format(),
+        ...rest
       })
         .into('notifications')
         .then(trx.commit)
