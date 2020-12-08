@@ -57,9 +57,9 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
 
 const nifty200 = "46553",
   nifty100 = "33619";
-export const getVolumeStocks = async (interval = "5minute") => {
+export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
 
-  const daysAgo = 15
+
 
   let scan_clause = `%7B${nifty200}%7D+(+%5B+0+%5D+5+minute+volume+%3E+(+(+%5B+-1+%5D+5+minute+volume+%2B+%5B+-2+%5D+5+minute+volume+%2B+%5B+-3+%5D+5+minute+volume+)+%2F+3+)+*+2+)`;
   if (interval === "day") {
@@ -76,7 +76,7 @@ export const getVolumeStocks = async (interval = "5minute") => {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "X-CSRF-TOKEN": env.chartintToken,
+          "x-xsrf-token": env.chartintToken,
           // tslint:disable-next-line:object-literal-key-quotes
 
           Cookie: env.chartintCookie,
@@ -789,7 +789,7 @@ const getLowestLow = (
 const getPriceActionLength = (priceAction) =>
   Math.abs(priceAction.lowestLow.indexNo - priceAction.highestHigh.indexNo);
 
-export const getDetails = async (symbol: string, type: string) => {
+export const getDetails = async (symbol: string, type: string, swingDate: string) => {
   const instrument = getInsruments(symbol);
 
   if (!instrument) {
@@ -807,14 +807,23 @@ export const getDetails = async (symbol: string, type: string) => {
   }
 
   let from = "";
+  let to = "";
   if (interval === "5minute") {
     from = moment().format("YYYY-MM-DD") + "+09:15:00";
+    to = moment().format("YYYY-MM-DD+HH:mm:ss");
   } else if (interval === "day") {
-    from = moment().add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
-  }
-  console.log('from', from)
-  const data = await getHistorical(instrument, interval, from);
+    let frm;
+    if (swingDate) {
+      frm = moment(swingDate)
+    } else {
+      frm = moment();
+    }
+    from = frm.add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
+    to = moment(swingDate).format("YYYY-MM-DD") + "+16:00:00";
 
+  }
+  const data = await getHistorical(instrument, interval, from, to);
+  console.log("LOG", data)
   let priceAction = await getPriceAction(data);
 
   const priceActionLength = getPriceActionLength(priceAction);
@@ -979,7 +988,7 @@ const getTodaysIntradayStocks = async () => {
 
 export const insertNotification = async (notification) => {
   // Notification.find(x=>x.)
-  const today = moment();
+  const today = notification.date ? moment(notification.date) : moment();
   let allow = false;
   if (notification.type === "swing") {
     // const stock = await Notification.findOne({
@@ -1049,7 +1058,11 @@ export const getSwingStocks = async (type: string, trend?: string) => {
     }
     const bag = [];
 
-    const volumedStocks = await getVolumeStocks(interval);
+    const daysAgo = +env.DAYS_AGO || 0
+    const swingDate = env.SWING_DATE.toString() || null
+
+    // return;
+    const volumedStocks = await getVolumeStocks(interval, daysAgo);
 
     if (volumedStocks) {
       const symbols = volumedStocks && volumedStocks.map((x) => x.nsecode);
@@ -1078,9 +1091,11 @@ export const getSwingStocks = async (type: string, trend?: string) => {
             }) STOCK=>${x}`
           );
 
-          const data = await getDetails(x, type);
+          const data = await getDetails(x, type, swingDate);
           if (type === "intraday") {
             console.log("Data ", data);
+          } else {
+            x.date = moment(swingDate);
           }
 
           if (data) {
