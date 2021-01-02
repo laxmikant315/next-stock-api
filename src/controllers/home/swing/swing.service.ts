@@ -5,6 +5,8 @@ import * as instruments from "./instruments.json";
 
 import axios from "axios";
 import { env } from "process";
+
+const cheerio = require('cheerio');
 //@ts-ignore
 import * as moment from "moment";
 
@@ -17,7 +19,7 @@ import { db } from "../../../server";
 var dataMain: any = [];
 
 let todaysIntradayStock;
-
+let chartintCookie, chartintToken;
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
 
@@ -55,6 +57,19 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
   }
 };
 
+const getChartint = async () => {
+  const result = await axios.get('https://chartink.com');
+  const $ = cheerio.load(result.data);
+  const csrfToken = $('meta[name=csrf-token]').attr('content');
+
+  const [xsrfR, ciSessionR] = result.headers["set-cookie"];
+
+  const xsrf = xsrfR.split(";")[0]
+  const ciSession = ciSessionR.split(";")[0]
+
+  return { csrfToken, cookie: `${xsrf}; ${ciSession}` }
+
+}
 const nifty200 = "46553",
   nifty100 = "33619";
 export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
@@ -67,6 +82,14 @@ export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
       `(+%7B57960%7D+(+${daysAgo ? `${daysAgo}+day+ago` : 'latest'}+volume+%3E+(+(+${daysAgo + 1}+day+ago+volume+%2B+${daysAgo + 2}+days+ago+volume+%2B+${daysAgo + 3}+days+ago+volume+%2B+${daysAgo + 4}+days+ago+volume+%2B+${daysAgo + 5}+days+ago+volume+)+%2F+5+)+*+2+)+)+`;
   }
 
+  if (!(chartintCookie && chartintToken)) {
+    const { csrfToken, cookie } = await getChartint();
+    chartintCookie = cookie;
+    chartintToken = csrfToken
+
+  }
+
+
   return await axios
     .post(
       "https://chartink.com/screener/process",
@@ -75,11 +98,11 @@ export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
 
       {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "x-xsrf-token": env.chartintToken,
-          // tslint:disable-next-line:object-literal-key-quotes
 
-          Cookie: env.chartintCookie,
+          'x-csrf-token': chartintToken,
+          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Cookie': chartintCookie
+
         },
       }
     )

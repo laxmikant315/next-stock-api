@@ -1,9 +1,10 @@
 import * as express from "express";
 import { Request, Response } from "express";
 import IControllerBase from "interfaces/IControllerBase.interface";
-
+import axios from 'axios';
 import moment = require("moment");
 import { db } from "../../server";
+const cheerio = require('cheerio');
 
 class SwingController implements IControllerBase {
   public path = "/swing/v2";
@@ -264,7 +265,10 @@ class SwingController implements IControllerBase {
       },
     ];
 
+
     res.send({ users });
+
+
   };
 }
 
