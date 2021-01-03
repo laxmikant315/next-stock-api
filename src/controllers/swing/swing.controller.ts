@@ -4,6 +4,7 @@ import IControllerBase from "interfaces/IControllerBase.interface";
 import axios from 'axios';
 import moment = require("moment");
 import { db } from "../../server";
+import { getLogin, sendSms } from "../../controllers/home/swing/swing.service";
 const cheerio = require('cheerio');
 
 class SwingController implements IControllerBase {
@@ -249,7 +250,7 @@ class SwingController implements IControllerBase {
     res.send(item);
   };
 
-  index = (req: Request, res: Response) => {
+  index = async (req: Request, res: Response) => {
     const users = [
       {
         id: 1,
@@ -267,7 +268,6 @@ class SwingController implements IControllerBase {
 
 
     res.send({ users });
-
 
   };
 }

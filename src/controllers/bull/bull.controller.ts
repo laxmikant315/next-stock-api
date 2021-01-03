@@ -94,15 +94,15 @@ class BullController implements IControllerBase {
   public router = express.Router();
   REDIS_URL = process.env.REDIS_URL || "redis://127.0.0.1:6379";
   cronSwing = process.env.CRON_SWING_TIME;
-  cronIntraday = process.env.CRON_INTRADAY_TIME;
+  // cronIntraday = process.env.CRON_INTRADAY_TIME;
 
   swingQueue = new Bull("swing-queue", this.REDIS_URL);
-  intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
+  // intradayQueue = new Bull("intraday-queue", this.REDIS_URL);
 
 
   // dailyQueue = new Bull("daily-queue", this.REDIS_URL);
 
-  dailyEveningQueue = new Bull("daily-eveing-queue", this.REDIS_URL);
+  // dailyEveningQueue = new Bull("daily-eveing-queue", this.REDIS_URL);
 
   publicVapidKey = process.env.PUBLIC_VAPID_KEY;
   privateVapidKey = process.env.PRIVATE_VAPID_KEY;
@@ -137,10 +137,10 @@ class BullController implements IControllerBase {
       //   getIntradayStocks();
       // });
 
-      this.dailyEveningQueue.process(async () => {
-        console.log("process dailyEveningQueue started");
-        await deleteIntradayStocks();
-      });
+      // this.dailyEveningQueue.process(async () => {
+      //   console.log("process dailyEveningQueue started");
+      //   await deleteIntradayStocks();
+      // });
 
 
 
@@ -149,10 +149,10 @@ class BullController implements IControllerBase {
         return this.getStocks("swing");
       });
 
-      this.intradayQueue.process(async (job) => {
-        console.log("Intraday job started", job.data);
-        return this.getStocks("intraday");
-      });
+      // this.intradayQueue.process(async (job) => {
+      //   console.log("Intraday job started", job.data);
+      //   return this.getStocks("intraday");
+      // });
 
       this.swingQueue.on("completed", (job, result) => {
         console.log(
@@ -230,12 +230,12 @@ class BullController implements IControllerBase {
       }
     );
 
-    await this.intradayQueue.add(
-      {},
-      {
-        repeat: { cron: this.cronIntraday },
-      }
-    );
+    // await this.intradayQueue.add(
+    //   {},
+    //   {
+    //     repeat: { cron: this.cronIntraday },
+    //   }
+    // );
 
     // await this.dailyQueue.add(
     //   {},
@@ -243,12 +243,12 @@ class BullController implements IControllerBase {
     //     repeat: { cron: process.env.CRON_DAILY },
     //   }
     // );
-    await this.dailyEveningQueue.add(
-      {},
-      {
-        repeat: { cron: process.env.CRON_DAILY_EVENING },
-      }
-    );
+    // await this.dailyEveningQueue.add(
+    //   {},
+    //   {
+    //     repeat: { cron: process.env.CRON_DAILY_EVENING },
+    //   }
+    // );
 
     console.log("Jobs Created");
   }

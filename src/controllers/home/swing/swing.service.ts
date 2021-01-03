@@ -7,6 +7,8 @@ import axios from "axios";
 import { env } from "process";
 
 const cheerio = require('cheerio');
+
+var qs = require('qs');
 //@ts-ignore
 import * as moment from "moment";
 
@@ -19,7 +21,7 @@ import { db } from "../../../server";
 var dataMain: any = [];
 
 let todaysIntradayStock;
-let chartintCookie, chartintToken;
+let chartintCookie, chartintToken, kiteToken;
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
 
@@ -69,6 +71,87 @@ const getChartint = async () => {
 
   return { csrfToken, cookie: `${xsrf}; ${ciSession}` }
 
+}
+
+
+export const getLogin = async () => {
+
+  const userId = 'BV7667';
+  const pswd = env.pswd;
+  const twofa = env.twofa;
+  console.log(pswd, twofa);
+
+  let data = qs.stringify({
+    'user_id': userId,
+    'password': pswd
+  });
+
+
+  let headers: any = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+
+  let response: any = await axios.post(env.zerodhaUrl + 'api/login', data, { headers }).catch(function (error) {
+    console.log(error);
+  });
+
+  const requestId = response.data.data.request_id;
+
+  const [cfduid, kfSession] = response.headers['set-cookie'];
+  console.log(cfduid, kfSession);
+
+  const cookie = `${cfduid.split(";")[0]};${kfSession.split(";")[0]}`
+
+
+
+  data = qs.stringify({
+    'user_id': userId,
+    'request_id': requestId,
+    'twofa_value': twofa
+  });
+
+  headers = { ...headers, 'Cookie': cookie }
+  console.log('headers', headers)
+  response = await axios.post(env.zerodhaUrl + 'api/twofa', data, { headers }).catch(function (error) {
+    console.log(error);
+  });
+
+  console.log('response', response)
+  const enctoken = response.headers['set-cookie'][2]
+  const ctoken: string = enctoken.split(";")[0].toString();
+  const token = ctoken.substring(0, 8) + " " + ctoken.substring(9, ctoken.length)
+  console.log('token', token);
+
+  const res = await sendSms();
+  if (!res) {
+    return;
+  }
+  return token;
+}
+
+export const sendSms = async () => {
+
+  var data = JSON.stringify({ "to": "918286888931", "content": `Next App login done at ${moment().format()}`, "from": "smsinfo" });
+
+  var options: any = {
+    method: 'post',
+    url: 'https://rest-api.d7networks.com/secure/send',
+    headers: {
+      'Authorization': 'Basic bXN0aTY2MTI6Y2pycGtjNzM=',
+      'Content-Type': 'application/json',
+      'cache-control': 'no-cache'
+    },
+    data: data
+  };
+
+
+
+  const response = await axios.request(options)
+    .catch(function (error) {
+      console.error(error);
+    });
+
+  return response;
 }
 const nifty200 = "46553",
   nifty100 = "33619";
@@ -214,12 +297,22 @@ export const getHistorical = async (
 ) => {
   // return mockData.data.candles;
 
+
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
   console.log(url)
+
+  if (!kiteToken) {
+    kiteToken = await getLogin()
+    if (!kiteToken) {
+      return "TOKEN not found!!!"
+    }
+  }
+
+
   return await axios
     .get(url, {
       headers: {
-        authorization: env.accessToken,
+        authorization: kiteToken,
       },
     })
 
@@ -842,7 +935,11 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
       frm = moment();
     }
     from = frm.add(-60, "days").format("YYYY-MM-DD") + "+09:15:00";
-    to = moment(swingDate).format("YYYY-MM-DD") + "+16:00:00";
+    if (swingDate) {
+      to = moment(swingDate).format("YYYY-MM-DD") + "+16:00:00";
+    } else {
+      to = moment().format("YYYY-MM-DD+HH:mm:ss");
+    }
 
   }
   const data = await getHistorical(instrument, interval, from, to);

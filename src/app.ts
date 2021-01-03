@@ -69,6 +69,7 @@ class App {
     // console.log("Database connected.");
   }
 
+
   private routes(controllers: {
     forEach: (arg0: (controller: any) => void) => void;
   }) {
