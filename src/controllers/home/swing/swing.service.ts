@@ -137,7 +137,7 @@ export const sendSms = async () => {
     method: 'post',
     url: 'https://rest-api.d7networks.com/secure/send',
     headers: {
-      'Authorization': 'Basic bXN0aTY2MTI6Y2pycGtjNzM=',
+      'Authorization': env.smsToken,
       'Content-Type': 'application/json',
       'cache-control': 'no-cache'
     },
