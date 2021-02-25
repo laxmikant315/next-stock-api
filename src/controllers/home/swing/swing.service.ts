@@ -6,12 +6,11 @@ import * as instruments from "./instruments.json";
 import axios from "axios";
 import { env } from "process";
 
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 
-var qs = require('qs');
+var qs = require("qs");
 //@ts-ignore
 import * as moment from "moment";
-
 
 import * as mongoose from "mongoose";
 import e = require("express");
@@ -25,21 +24,23 @@ let chartintCookie, chartintToken, kiteToken;
 export const deleteIntradayStocks = async () => {
   todaysIntradayStock = [];
 
-
   // await Notification.deleteMany({ type: "intraday" }).catch((e) => {
   //   console.log("Failed to delete intraday stocks.", e);
   // });
 
-  await db('notifications').del().where({ type: "intraday" }).catch(e => console.log("Failed to delete intraday stocks.", e))
-
-
-
+  await db("notifications")
+    .del()
+    .where({ type: "intraday" })
+    .catch((e) => console.log("Failed to delete intraday stocks.", e));
 
   // await Notification.deleteMany({ type: "priceaction" }).catch((e) => {
   //   console.log("Failed to delete intraday Logs.", e);
   // });
 
-  await db('notifications').del().where({ type: "priceaction" }).catch(e => console.log("Failed to delete intraday stocks.", e))
+  await db("notifications")
+    .del()
+    .where({ type: "priceaction" })
+    .catch((e) => console.log("Failed to delete intraday stocks.", e));
 
   console.log("Intraday stocks & logs deleted");
 };
@@ -60,118 +61,117 @@ export const getDailyVolatilitedStocks = async (dateNow: string) => {
 };
 
 const getChartint = async () => {
-  const result = await axios.get('https://chartink.com');
+  const result = await axios.get("https://chartink.com");
   const $ = cheerio.load(result.data);
-  const csrfToken = $('meta[name=csrf-token]').attr('content');
+  const csrfToken = $("meta[name=csrf-token]").attr("content");
 
   const [xsrfR, ciSessionR] = result.headers["set-cookie"];
 
-  const xsrf = xsrfR.split(";")[0]
-  const ciSession = ciSessionR.split(";")[0]
+  const xsrf = xsrfR.split(";")[0];
+  const ciSession = ciSessionR.split(";")[0];
 
-  return { csrfToken, cookie: `${xsrf}; ${ciSession}` }
-
-}
-
+  return { csrfToken, cookie: `${xsrf}; ${ciSession}` };
+};
 
 export const getLogin = async () => {
-
-  const userId = 'BV7667';
+  const userId = "BV7667";
   const pswd = env.pswd;
   const twofa = env.twofa;
   console.log(pswd, twofa);
 
   let data = qs.stringify({
-    'user_id': userId,
-    'password': pswd
+    user_id: userId,
+    password: pswd,
   });
-
 
   let headers: any = {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  }
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
 
-  let response: any = await axios.post(env.zerodhaUrl + 'api/login', data, { headers }).catch(function (error) {
-    console.log(error);
-  });
+  let response: any = await axios
+    .post(env.zerodhaUrl + "api/login", data, { headers })
+    .catch(function (error) {
+      console.log(error);
+    });
 
   const requestId = response.data.data.request_id;
 
-  const [cfduid, kfSession] = response.headers['set-cookie'];
+  const [cfduid, kfSession] = response.headers["set-cookie"];
   console.log(cfduid, kfSession);
 
-  const cookie = `${cfduid.split(";")[0]};${kfSession.split(";")[0]}`
-
-
+  const cookie = `${cfduid.split(";")[0]};${kfSession.split(";")[0]}`;
 
   data = qs.stringify({
-    'user_id': userId,
-    'request_id': requestId,
-    'twofa_value': twofa
+    user_id: userId,
+    request_id: requestId,
+    twofa_value: twofa,
   });
 
-  headers = { ...headers, 'Cookie': cookie }
-  console.log('headers', headers)
-  response = await axios.post(env.zerodhaUrl + 'api/twofa', data, { headers }).catch(function (error) {
-    console.log(error);
-  });
-
-  console.log('response', response)
-  const enctoken = response.headers['set-cookie'][2]
-  const ctoken: string = enctoken.split(";")[0].toString();
-  const token = ctoken.substring(0, 8) + " " + ctoken.substring(9, ctoken.length)
-  console.log('token', token);
-
-  const res = await sendSms();
-  if (!res) {
-    return;
-  }
-  return token;
-}
-
-export const sendSms = async () => {
-
-  var data = JSON.stringify({ "to": "918286888931", "content": `Next App login done at ${moment().format()}`, "from": "smsinfo" });
-
-  var options: any = {
-    method: 'post',
-    url: 'https://rest-api.d7networks.com/secure/send',
-    headers: {
-      'Authorization': env.smsToken,
-      'Content-Type': 'application/json',
-      'cache-control': 'no-cache'
-    },
-    data: data
-  };
-
-
-
-  const response = await axios.request(options)
+  headers = { ...headers, Cookie: cookie };
+  console.log("headers", headers);
+  response = await axios
+    .post(env.zerodhaUrl + "api/twofa", data, { headers })
     .catch(function (error) {
-      console.error(error);
+      console.log(error);
     });
 
+  console.log("response", response);
+  const enctoken = response.headers["set-cookie"][2];
+  const ctoken: string = enctoken.split(";")[0].toString();
+  const token =
+    ctoken.substring(0, 8) + " " + ctoken.substring(9, ctoken.length);
+  console.log("token", token);
+
+  // const res = await sendSms();
+  // if (!res) {
+  //   return;
+  // }
+  return token;
+};
+
+export const sendSms = async () => {
+  var data = JSON.stringify({
+    to: "918286888931",
+    content: `Next App login done at ${moment().format()}`,
+    from: "smsinfo",
+  });
+
+  var options: any = {
+    method: "post",
+    url: "https://rest-api.d7networks.com/secure/send",
+    headers: {
+      Authorization: env.smsToken,
+      "Content-Type": "application/json",
+      "cache-control": "no-cache",
+    },
+    data: data,
+  };
+
+  const response = await axios.request(options).catch(function (error) {
+    console.error(error);
+  });
+
   return response;
-}
+};
 const nifty200 = "46553",
   nifty100 = "33619";
 export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
-
-
-
   let scan_clause = `%7B${nifty200}%7D+(+%5B+0+%5D+5+minute+volume+%3E+(+(+%5B+-1+%5D+5+minute+volume+%2B+%5B+-2+%5D+5+minute+volume+%2B+%5B+-3+%5D+5+minute+volume+)+%2F+3+)+*+2+)`;
   if (interval === "day") {
-    scan_clause =
-      `(+%7B57960%7D+(+${daysAgo ? `${daysAgo}+day+ago` : 'latest'}+volume+%3E+(+(+${daysAgo + 1}+day+ago+volume+%2B+${daysAgo + 2}+days+ago+volume+%2B+${daysAgo + 3}+days+ago+volume+%2B+${daysAgo + 4}+days+ago+volume+%2B+${daysAgo + 5}+days+ago+volume+)+%2F+5+)+*+2+)+)+`;
+    scan_clause = `(+%7B57960%7D+(+${
+      daysAgo ? `${daysAgo}+day+ago` : "latest"
+    }+volume+%3E+(+(+${daysAgo + 1}+day+ago+volume+%2B+${
+      daysAgo + 2
+    }+days+ago+volume+%2B+${daysAgo + 3}+days+ago+volume+%2B+${
+      daysAgo + 4
+    }+days+ago+volume+%2B+${daysAgo + 5}+days+ago+volume+)+%2F+5+)+*+2+)+)+`;
   }
 
   if (!(chartintCookie && chartintToken)) {
     const { csrfToken, cookie } = await getChartint();
     chartintCookie = cookie;
-    chartintToken = csrfToken
-
+    chartintToken = csrfToken;
   }
-
 
   return await axios
     .post(
@@ -181,11 +181,9 @@ export const getVolumeStocks = async (interval = "5minute", daysAgo = 0) => {
 
       {
         headers: {
-
-          'x-csrf-token': chartintToken,
-          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Cookie': chartintCookie
-
+          "x-csrf-token": chartintToken,
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+          Cookie: chartintCookie,
         },
       }
     )
@@ -297,17 +295,15 @@ export const getHistorical = async (
 ) => {
   // return mockData.data.candles;
 
-
   const url = `${env.zerodhaUrl}oms/instruments/historical/${instrumentToken}/${interval}?from=${from}&to=${to}`;
-  console.log(url)
+  console.log(url);
 
   if (!kiteToken) {
-    kiteToken = await getLogin()
+    kiteToken = await getLogin();
     if (!kiteToken) {
-      return "TOKEN not found!!!"
+      return "TOKEN not found!!!";
     }
   }
-
 
   return await axios
     .get(url, {
@@ -455,7 +451,6 @@ const getPriceAction = async (data, secondTry = false) => {
       goingUp,
       goingUp ? firstLow.indexNo + 1 : lowestLow.indexNo
     );
-
   } else {
     // const firstHighCandelIndex = data.indexOf(data.find(x => x[2] === firstHigh));
 
@@ -482,8 +477,6 @@ const getPriceAction = async (data, secondTry = false) => {
 
     low = firstLow;
     high = lastHigh;
-
-
   } else if (
     highestHigh.highest > firstHigh.highest &&
     lowestLow.lowest < lastLow.lowest
@@ -516,7 +509,6 @@ const getPriceAction = async (data, secondTry = false) => {
   const peak = d - a;
   const volumned = e - d;
   if (peak < volumned) {
-
     valid = false;
 
     invalidReason = `volumed candel distance from Trend Peak is invalid.peak:${peak},volumned:${volumned}`;
@@ -552,8 +544,6 @@ const getPriceAction = async (data, secondTry = false) => {
 
       valid = val0 && val1 && val2;
 
-
-
       if (!valid) {
         if (!val0) {
           invalidReason =
@@ -577,8 +567,6 @@ const getPriceAction = async (data, secondTry = false) => {
       const val1 = latestCandel[4] < highestHigh.highest;
       const val2 = latestCandel[4] > highestHigh.highest - perGap60;
       valid = val0 && val1 && val2;
-
-
 
       if (!valid) {
         if (!val0) {
@@ -651,7 +639,6 @@ const getPriceAction = async (data, secondTry = false) => {
     }
   }
 
-
   // validate if previous candel of volumed candel is valid or invalid
 
   // Calculate LastCandelIsGreen or red
@@ -667,28 +654,27 @@ const getPriceAction = async (data, secondTry = false) => {
     }
   }
 
-
-
   // Trend line validation Start
   if (valid) {
     if (trend === "UP") {
       if (highestHigh.indexNo < latestCandelIndex) {
         //console.log(`lowPlus30 = low.lowest${low.lowest} + ((highestHigh.highest${highestHigh.highest}-low.lowest${low.lowest})*0.3)`)
 
-        const lowPlus30 = low.lowest + ((highestHigh.highest - low.lowest) * 0.15)
+        const lowPlus30 =
+          low.lowest + (highestHigh.highest - low.lowest) * 0.15;
         // console.log(`lowPlus30=${lowPlus30}`)
 
         for (let i = highestHigh.indexNo; i <= latestCandelIndex; i++) {
-
           if (data[i] && data[i][3] < lowPlus30) {
-            console.log(data[i])
+            console.log(data[i]);
             valid = false;
           }
         }
       }
     } else if (trend === "DOWN") {
       if (lowestLow.indexNo < latestCandelIndex) {
-        const highMinus30 = high.highest - ((high.highest - lowestLow.lowest) * 0.15)
+        const highMinus30 =
+          high.highest - (high.highest - lowestLow.lowest) * 0.15;
         for (let i = lowestLow.indexNo; i <= latestCandelIndex; i++) {
           if (data[i] && data[i][2] > highMinus30) {
             valid = false;
@@ -705,7 +691,6 @@ const getPriceAction = async (data, secondTry = false) => {
   // Trend line validation End
 
   if (valid) {
-
     const previosCandel = data[latestCandelIndex - 1];
     if (trend === "UP") {
       if (previosCandel[2] > latestCandel[4]) {
@@ -722,18 +707,20 @@ const getPriceAction = async (data, secondTry = false) => {
     }
   }
 
-
   if (valid) {
-    valid = validatePriceAction({ ll: lowestLow.lowest, h: high.highest, l: low.lowest, hh: highestHigh.highest, trend })
+    valid = validatePriceAction({
+      ll: lowestLow.lowest,
+      h: high.highest,
+      l: low.lowest,
+      hh: highestHigh.highest,
+      trend,
+    });
     if (!valid) {
       invalidReason = "Price action HH,LL,L,H gap invalid.";
       saveLog = true;
     }
   }
   //end
-
-
-
 
   return {
     highestHigh: highestHigh.highest,
@@ -757,29 +744,39 @@ const getPriceAction = async (data, secondTry = false) => {
     lastCandelHeight: Math.abs(latestCandel[1] - latestCandel[4]),
     currentPrice: latestCandel[4],
     trendLine,
-    saveLog: true
+    saveLog: true,
   };
 };
 
-
-const validatePriceAction = ({ h, l, hh, ll, trend }: { h: number, l: number, hh: number, ll: number, trend: string }) => {
-  const a = ((Math.abs(ll - h)) * 20 / 100);
-  const b = ((Math.abs(hh - l)) * 20 / 100);
+const validatePriceAction = ({
+  h,
+  l,
+  hh,
+  ll,
+  trend,
+}: {
+  h: number;
+  l: number;
+  hh: number;
+  ll: number;
+  trend: string;
+}) => {
+  const a = (Math.abs(ll - h) * 20) / 100;
+  const b = (Math.abs(hh - l) * 20) / 100;
 
   if (trend === "UP") {
     // console.log(`${l}>(${a}+${ll})[${a+ll}] && ${h}<(${hh}-${b})[${b+hh}]`)
-    if (l > (a + ll) && h < (hh - b)) {
-      return true
+    if (l > a + ll && h < hh - b) {
+      return true;
     }
   } else if (trend === "DOWN") {
     // console.log(`${h}<(${hh}-${b})[${hh-b}] && ${l}>(${ll}+${a})[${ll+a}]`)
-    if (h < (hh - b) && l > (ll + a)) {
-      return true
+    if (h < hh - b && l > ll + a) {
+      return true;
     }
   }
-  return false
-
-}
+  return false;
+};
 const getDayData = async (instrumentToken, interval = "day") => {
   let from = moment().add(-1, "months").format("YYYY-MM-DD+HH:mm:ss");
 
@@ -905,7 +902,11 @@ const getLowestLow = (
 const getPriceActionLength = (priceAction) =>
   Math.abs(priceAction.lowestLow.indexNo - priceAction.highestHigh.indexNo);
 
-export const getDetails = async (symbol: string, type: string, swingDate: string) => {
+export const getDetails = async (
+  symbol: string,
+  type: string,
+  swingDate: string
+) => {
   const instrument = getInsruments(symbol);
 
   if (!instrument) {
@@ -930,7 +931,7 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
   } else if (interval === "day") {
     let frm;
     if (swingDate) {
-      frm = moment(swingDate)
+      frm = moment(swingDate);
     } else {
       frm = moment();
     }
@@ -940,18 +941,18 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
     } else {
       to = moment().format("YYYY-MM-DD+HH:mm:ss");
     }
-
   }
   const data = await getHistorical(instrument, interval, from, to);
-  console.log("LOG", data)
+  console.log("LOG", data);
   let priceAction = await getPriceAction(data);
 
   const priceActionLength = getPriceActionLength(priceAction);
 
-  let secondTry = false, secondTryPriceActionLength = 0, secondTryPriceActionSecondLength = 0;
+  let secondTry = false,
+    secondTryPriceActionLength = 0,
+    secondTryPriceActionSecondLength = 0;
 
   if (priceAction && !priceAction.valid) {
-
     let startIndex;
     if (priceAction.trend === "UP") {
       startIndex = priceAction.highestHigh.indexNo;
@@ -971,7 +972,7 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
         // secondTry = { bit: true, priceActionLength, priceActionSecondLength };
         secondTry = true;
         secondTryPriceActionLength = priceActionLength;
-        secondTryPriceActionSecondLength = priceActionSecondLength
+        secondTryPriceActionSecondLength = priceActionSecondLength;
       }
     }
   }
@@ -981,9 +982,16 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
   }
   if (type === "intraday" && priceAction.saveLog) {
     try {
-      const { saveLog, firstHourData, latestCandel, per60, totalCandels, ...rest } = priceAction;
+      const {
+        saveLog,
+        firstHourData,
+        latestCandel,
+        per60,
+        totalCandels,
+        ...rest
+      } = priceAction;
       insertNotification({ ...rest, type: "priceaction", symbol });
-    } catch (error) { }
+    } catch (error) {}
   }
   const candelHeightIsValid =
     priceAction.lastCandelHeight > (priceAction.avgHeight * 60) / 100;
@@ -1002,42 +1010,32 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
     priceAction.valid &&
     candelHeightIsValid
   ) {
-
-
     if (type === "intraday") {
       const formula = (price: number) => Math.round((price / 3000) * 10) / 10;
       const properGap = (price: number) => price / 125;
 
       let orderPrice, sl1, target;
       if (priceAction.trend === "UP") {
-
         const price = priceAction.latestCandel[2];
         orderPrice = price + formula(price);
-        sl1 = orderPrice - properGap(orderPrice)
-        target = orderPrice + properGap(orderPrice)
-
-
-
+        sl1 = orderPrice - properGap(orderPrice);
+        target = orderPrice + properGap(orderPrice);
       } else if (priceAction.trend === "DOWN") {
         const price = priceAction.latestCandel[3];
         orderPrice = price - formula(price);
 
-        sl1 = orderPrice + properGap(orderPrice)
-        target = orderPrice - properGap(orderPrice)
-
+        sl1 = orderPrice + properGap(orderPrice);
+        target = orderPrice - properGap(orderPrice);
       }
-      orderPrice = Math.round(orderPrice * 20) / 20
-      sl1 = Math.round(sl1 * 20) / 20
-      target = Math.round(target * 20) / 20
+      orderPrice = Math.round(orderPrice * 20) / 20;
+      sl1 = Math.round(sl1 * 20) / 20;
+      target = Math.round(target * 20) / 20;
 
       // tradeInfo = { orderPrice, sl1, target }
       tradeInfoOrderPrice = orderPrice;
       tradeInfoSl1 = sl1;
-      tradeInfoTarget = target
-
+      tradeInfoTarget = target;
     }
-
-
 
     const dayData = await getDayData(instrument, intervalParent);
 
@@ -1078,9 +1076,10 @@ export const getDetails = async (symbol: string, type: string, swingDate: string
       secondTry,
       secondTryPriceActionLength,
       secondTryPriceActionSecondLength,
-      tradeInfoOrderPrice, tradeInfoSl1, tradeInfoTarget
+      tradeInfoOrderPrice,
+      tradeInfoSl1,
+      tradeInfoTarget,
     };
-
 
     console.log("Price Action", data);
     return data;
@@ -1101,7 +1100,7 @@ const getTodaysIntradayStocks = async () => {
   // );
 
   // const appSettings = await AppSettings.findOne().exec();
-  const appSettings = await db.select().table('appSettings').first();
+  const appSettings = await db.select().table("appSettings").first();
 
   const intradayStocks = appSettings["intradayStocks"];
 
@@ -1121,9 +1120,14 @@ export const insertNotification = async (notification) => {
     //   symbol: notification.symbol,
     // });
 
-    const stock = await db('notifications').select().first().where({ symbol: notification.symbol }).whereBetween('createDt', [today.startOf("day").toDate(), today.endOf("day").toDate()]);
-
-
+    const stock = await db("notifications")
+      .select()
+      .first()
+      .where({ symbol: notification.symbol })
+      .whereBetween("createDt", [
+        today.startOf("day").toDate(),
+        today.endOf("day").toDate(),
+      ]);
 
     if (!stock) {
       allow = true;
@@ -1133,27 +1137,23 @@ export const insertNotification = async (notification) => {
   }
 
   if (allow) {
-
-
-
     // await notificationObj
     //   .save()
     //   .catch((error) => console.log("Failed to save notification", error));
 
     const { date, ...rest } = notification;
-    db.transaction(trx => {
-      trx.insert({
-        createDt: today.format(),
-        ...rest
-      })
-        .into('notifications')
+    db.transaction((trx) => {
+      trx
+        .insert({
+          createDt: today.format(),
+          ...rest,
+        })
+        .into("notifications")
         .then(trx.commit)
-        .catch(trx.rollback)
-    })
-      .catch(err => {
-        console.log("Failed to save notification", err)
-
-      })
+        .catch(trx.rollback);
+    }).catch((err) => {
+      console.log("Failed to save notification", err);
+    });
     console.log("Document inserted");
     return true;
   }
@@ -1180,8 +1180,8 @@ export const getSwingStocks = async (type: string, trend?: string) => {
     }
     const bag = [];
 
-    const daysAgo = +env.DAYS_AGO || 0
-    const swingDate = env.SWING_DATE.toString() || null
+    const daysAgo = +env.DAYS_AGO || 0;
+    const swingDate = env.SWING_DATE.toString() || null;
 
     // return;
     const volumedStocks = await getVolumeStocks(interval, daysAgo);
@@ -1194,9 +1194,7 @@ export const getSwingStocks = async (type: string, trend?: string) => {
         if (!todaysIntradayStock) {
           await getIntradayStocks();
         }
-        finalStocks = symbols.filter((x) =>
-          todaysIntradayStock.includes(x)
-        );
+        finalStocks = symbols.filter((x) => todaysIntradayStock.includes(x));
       }
       //  const finalStocks= swingStocks.filter(x=> symbols.includes(x))
 
@@ -1209,7 +1207,8 @@ export const getSwingStocks = async (type: string, trend?: string) => {
       for (let x of finalStocks) {
         try {
           console.log(
-            `Process(${finalStocks.indexOf(x) + 1}/${finalStocks.length
+            `Process(${finalStocks.indexOf(x) + 1}/${
+              finalStocks.length
             }) STOCK=>${x}`
           );
 
@@ -1219,7 +1218,6 @@ export const getSwingStocks = async (type: string, trend?: string) => {
           }
 
           if (data) {
-
             if (
               type === "intraday" ||
               (data.lastCandelIsGreen && data.trend.toUpperCase() === "UP") ||
