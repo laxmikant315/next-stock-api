@@ -27,7 +27,7 @@
     "moment": "^2.25.3",
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.13",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "socket.io": "^2.3.0",
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3",
